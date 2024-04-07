@@ -1,4 +1,4 @@
-package com.hrbuddy.rest.resources;
+package com.hrbuddy.rest.controllers;
 
 
 import com.hrbuddy.rest.messages.ErrorMessage;
@@ -15,7 +15,7 @@ import java.util.Optional;
 
 
 @Path("/jobs")
-public class JobResource {
+public class JobController {
 
     @GET
     @Produces({MediaType.APPLICATION_JSON, MediaType.APPLICATION_XML})
@@ -61,7 +61,6 @@ public class JobResource {
             Response response = Response.status(Response.Status.BAD_REQUEST).entity(errorMessage).build();
             throw new WebApplicationException(response);
         }
-
     }
     @PUT
     @Produces({MediaType.APPLICATION_JSON, MediaType.APPLICATION_XML})
@@ -70,6 +69,15 @@ public class JobResource {
         try {
             JobDTO updatedJob = JobService.updateJob(job);
             return Response.ok().entity(updatedJob).build();
+        } catch (IllegalArgumentException ex){
+            ErrorMessage message = ErrorMessage
+                    .builder()
+                    .message(ResponseMessage.BAD_REQUEST.name())
+                    .code(400)
+                    .description(ex.getMessage())
+                    .build();
+            Response response = Response.status(Response.Status.BAD_REQUEST).entity(message).build();
+            throw new WebApplicationException(response);
         } catch (Exception e) {
             ErrorMessage message = ErrorMessage
                     .builder()

@@ -29,7 +29,7 @@ public class Department {
 
     @NotNull
     @OneToOne(fetch = FetchType.LAZY, optional = false)
-    @JoinColumn(name = "dep_managerId", nullable = false)
+    @JoinColumn(name = "manager_id", nullable = false)
     @ToString.Exclude
     private Employee departmentManager;
 

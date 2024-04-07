@@ -9,10 +9,6 @@
             <param-name>jersey.config.server.provider.packages</param-name>
             <param-value>com.hrbuddy.rest</param-value>
         </init-param>
-        <init-param>
-            <param-name>jersey.config.server.provider.classnames</param-name>
-            <param-value>org.glassfish.jersey.jackson.JacksonFeature;com.yourpackage.JAXBContextResolver</param-value>
-        </init-param>
         <load-on-startup>1</load-on-startup>
     </servlet>
     <servlet-mapping>

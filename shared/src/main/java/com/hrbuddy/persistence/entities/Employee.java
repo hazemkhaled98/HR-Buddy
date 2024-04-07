@@ -64,17 +64,15 @@ public class Employee {
     @ToString.Exclude
     private Employee manager;
 
-    @NotNull
-    @ManyToOne(fetch = FetchType.LAZY, optional = false)
-    @JoinColumn(name = "department_id", nullable = false)
+
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "department_id")
     @ToString.Exclude
     private Department department;
 
-    @NotNull
     @Column(name = "bonus", nullable = false, precision = 10, scale = 2)
     private BigDecimal bonus;
 
-    @NotNull
     @Column(name = "deduction", nullable = false, precision = 10, scale = 2)
     private BigDecimal deduction;
 
