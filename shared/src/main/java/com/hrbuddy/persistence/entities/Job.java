@@ -1,4 +1,4 @@
-package com.hrbuddy.persistence;
+package com.hrbuddy.persistence.entities;
 
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotNull;
@@ -19,6 +19,7 @@ import java.util.Set;
 @Table(name = "job")
 public class Job {
     @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "job_id", nullable = false)
     private Integer id;
 
@@ -38,5 +39,4 @@ public class Job {
     @OneToMany(mappedBy = "job")
     @ToString.Exclude
     private Set<Employee> employees = new LinkedHashSet<>();
-
 }

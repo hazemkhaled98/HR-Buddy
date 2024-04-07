@@ -1,8 +1,9 @@
-package com.hrbuddy.persistence;
+package com.hrbuddy.persistence.entities;
 
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Size;
+
 import lombok.*;
 
 import java.math.BigDecimal;
@@ -20,6 +21,7 @@ import java.util.Set;
 @Table(name = "employee")
 public class Employee {
     @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "employee_id", nullable = false)
     private Integer id;
 

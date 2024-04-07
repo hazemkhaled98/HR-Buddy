@@ -1,4 +1,4 @@
-package com.hrbuddy.persistence;
+package com.hrbuddy.persistence.entities;
 
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotNull;
@@ -18,6 +18,7 @@ import java.util.Set;
 @Table(name = "department")
 public class Department {
     @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "department_id", nullable = false)
     private Integer id;
 

@@ -1,4 +1,4 @@
-package com.hrbuddy.persistence;
+package com.hrbuddy.persistence.entities;
 
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotNull;
@@ -17,6 +17,7 @@ import java.time.Instant;
 @Table(name = "attendance")
 public class Attendance {
     @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "attendance_id", nullable = false)
     private Integer id;
 
