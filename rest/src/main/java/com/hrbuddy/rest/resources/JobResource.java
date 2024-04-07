@@ -18,7 +18,7 @@ import java.util.Optional;
 public class JobResource {
 
     @GET
-    @Produces(MediaType.APPLICATION_JSON)
+    @Produces({MediaType.APPLICATION_JSON, MediaType.APPLICATION_XML})
     public Response getAllJobs() {
         List<JobDTO> jobs = JobService.getAllJobs();
         GenericEntity<List<JobDTO>> entity = new GenericEntity<>(jobs){};
@@ -27,7 +27,7 @@ public class JobResource {
 
     @GET
     @Path("{id}")
-    @Produces(MediaType.APPLICATION_JSON)
+    @Produces({MediaType.APPLICATION_JSON, MediaType.APPLICATION_XML})
     public Response getJob(@PathParam("id") int id) {
         Optional<JobDTO> job = JobService.getJob(id);
         if(job.isEmpty()){
@@ -45,8 +45,8 @@ public class JobResource {
     }
 
     @POST
-    @Produces(MediaType.APPLICATION_JSON)
-    @Consumes(MediaType.APPLICATION_JSON)
+    @Produces({MediaType.APPLICATION_JSON, MediaType.APPLICATION_XML})
+    @Consumes({MediaType.APPLICATION_JSON, MediaType.APPLICATION_XML})
     public Response createJob(JobDTO job) {
         try {
             JobDTO createdJob = JobService.createJob(job);
@@ -64,8 +64,8 @@ public class JobResource {
 
     }
     @PUT
-    @Produces(MediaType.APPLICATION_JSON)
-    @Consumes(MediaType.APPLICATION_JSON)
+    @Produces({MediaType.APPLICATION_JSON, MediaType.APPLICATION_XML})
+    @Consumes({MediaType.APPLICATION_JSON, MediaType.APPLICATION_XML})
     public Response updateJob(JobDTO job) {
         try {
             JobDTO updatedJob = JobService.updateJob(job);

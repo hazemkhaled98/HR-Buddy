@@ -27,7 +27,6 @@
     </dependency>
 
 
-    <!-- JAXB API -->
     <dependency>
       <groupId>jakarta.xml.bind</groupId>
       <artifactId>jakarta.xml.bind-api</artifactId>
@@ -35,13 +34,13 @@
       <scope>compile</scope>
     </dependency>
 
-    <!-- JAXB Implementation -->
     <dependency>
-      <groupId>com.sun.xml.bind</groupId>
-      <artifactId>jaxb-impl</artifactId>
-      <version>4.0.2</version>
+      <groupId>org.glassfish.jaxb</groupId>
+      <artifactId>jaxb-runtime</artifactId>
+      <version>4.0.5</version>
       <scope>runtime</scope>
     </dependency>
+
 
   </dependencies>
 

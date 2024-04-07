@@ -18,7 +18,7 @@ import java.util.List;
 @Getter
 @Setter
 @ToString
-@XmlRootElement
+@XmlRootElement(name = "job")
 @XmlAccessorType(XmlAccessType.FIELD)
 public class JobDTO {
     private Integer id;
