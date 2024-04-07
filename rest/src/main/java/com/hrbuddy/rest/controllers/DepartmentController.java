@@ -3,8 +3,8 @@ package com.hrbuddy.rest.controllers;
 
 import com.hrbuddy.rest.messages.ErrorMessage;
 import com.hrbuddy.rest.messages.ResponseMessage;
-import com.hrbuddy.services.AttendanceService;
-import com.hrbuddy.services.dto.AttendanceDTO;
+import com.hrbuddy.services.DepartmentService;
+import com.hrbuddy.services.dto.DepartmentDTO;
 import jakarta.ws.rs.*;
 import jakarta.ws.rs.core.GenericEntity;
 import jakarta.ws.rs.core.MediaType;
@@ -13,23 +13,23 @@ import jakarta.ws.rs.core.Response;
 import java.util.List;
 import java.util.Optional;
 
-@Path("/attendances")
-public class AttendanceController {
+@Path("/departments")
+public class DepartmentController {
 
     @GET
     @Produces({MediaType.APPLICATION_JSON, MediaType.APPLICATION_XML})
-    public Response getAllAttendanceRecords() {
-        List<AttendanceDTO> attendances = AttendanceService.getAllAttendanceRecords();
-        GenericEntity<List<AttendanceDTO>> entity = new GenericEntity<>(attendances){};
+    public Response getAllDepartments() {
+        List<DepartmentDTO> departments = DepartmentService.getAllDepartments();
+        GenericEntity<List<DepartmentDTO>> entity = new GenericEntity<>(departments){};
         return Response.ok().entity(entity).build();
     }
 
     @GET
     @Path("{id}")
     @Produces({MediaType.APPLICATION_JSON, MediaType.APPLICATION_XML})
-    public Response getAttendanceRecord(@PathParam("id") int id) {
-        Optional<AttendanceDTO> attendance = AttendanceService.getAttendanceRecord(id);
-        if(attendance.isEmpty()){
+    public Response getDepartment(@PathParam("id") int id) {
+        Optional<DepartmentDTO> department = DepartmentService.getDepartment(id);
+        if(department.isEmpty()){
             ErrorMessage errorMessage = ErrorMessage
                     .builder()
                     .message(ResponseMessage.NOT_FOUND.name())
@@ -40,16 +40,16 @@ public class AttendanceController {
                     Response.status(Response.Status.NOT_FOUND).entity(errorMessage).build();
             throw new WebApplicationException(response);
         }
-        return Response.ok(attendance.get()).build();
+        return Response.ok(department.get()).build();
     }
 
     @POST
     @Produces({MediaType.APPLICATION_JSON, MediaType.APPLICATION_XML})
     @Consumes({MediaType.APPLICATION_JSON, MediaType.APPLICATION_XML})
-    public Response createAttendanceRecord(AttendanceDTO attendance) {
+    public Response createDepartment(DepartmentDTO department) {
         try {
-            AttendanceDTO createdAttendance = AttendanceService.createAttendance(attendance);
-            return Response.status(Response.Status.CREATED).entity(createdAttendance).build();
+            DepartmentDTO  createdDepartment = DepartmentService.createDepartment(department);
+            return Response.status(Response.Status.CREATED).entity(createdDepartment).build();
         } catch (IllegalArgumentException ex){
             ErrorMessage errorMessage = ErrorMessage
                     .builder()
@@ -64,7 +64,7 @@ public class AttendanceController {
                     .builder()
                     .message(ResponseMessage.BAD_REQUEST.name())
                     .code(400)
-                    .description("Couldn't create the attendance record. Maybe invalid format")
+                    .description("Couldn't create the department record. Maybe invalid format")
                     .build();
             Response response = Response.status(Response.Status.BAD_REQUEST).entity(errorMessage).build();
             throw new WebApplicationException(response);
@@ -73,10 +73,10 @@ public class AttendanceController {
     @PUT
     @Produces({MediaType.APPLICATION_JSON, MediaType.APPLICATION_XML})
     @Consumes({MediaType.APPLICATION_JSON, MediaType.APPLICATION_XML})
-    public Response updateAttendanceRecord(AttendanceDTO attendance) {
+    public Response updateDepartment(DepartmentDTO department) {
         try {
-            AttendanceDTO updatedAttendance = AttendanceService.updateAttendanceRecord(attendance);
-            return Response.ok().entity(updatedAttendance).build();
+            DepartmentDTO updatedDepartment = DepartmentService.updateDepartment(department);
+            return Response.ok().entity(updatedDepartment).build();
         } catch (IllegalArgumentException ex){
             ErrorMessage message = ErrorMessage
                     .builder()
@@ -92,7 +92,7 @@ public class AttendanceController {
                     .builder()
                     .message(ResponseMessage.BAD_REQUEST.name())
                     .code(400)
-                    .description("Couldn't update the attendance record. Maybe invalid format")
+                    .description("Couldn't update the department record. Maybe invalid format")
                     .build();
             Response response = Response.status(Response.Status.BAD_REQUEST).entity(message).build();
             throw new WebApplicationException(response);
@@ -101,18 +101,18 @@ public class AttendanceController {
 
 
     @DELETE
-    @Path("{id}")
     @Produces({MediaType.APPLICATION_JSON, MediaType.APPLICATION_XML})
-    public Response deleteAttendanceRecord(@PathParam("id") int id) {
+    @Path("{id}")
+    public Response deleteDepartment(@PathParam("id") int id) {
         try {
-            AttendanceService.deleteAttendanceRecord(id);
-            return Response.ok().entity("Attendance record was deleted successfully").build();
+            DepartmentService.deleteDepartment(id);
+            return Response.ok().entity("Department record was deleted successfully").build();
         } catch (Exception e) {
             ErrorMessage errorMessage = ErrorMessage
                     .builder()
                     .message(ResponseMessage.BAD_REQUEST.name())
                     .code(400)
-                    .description("Couldn't delete the Attendance record. Invalid ID.")
+                    .description("Couldn't delete the department record. If the id is correct, You need to move or delete employees in this department first.")
                     .build();
             Response response = Response.status(Response.Status.BAD_REQUEST).entity(errorMessage).build();
             throw new WebApplicationException(response);

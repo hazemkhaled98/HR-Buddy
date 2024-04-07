@@ -28,7 +28,7 @@ public class Department {
     private String name;
 
     @NotNull
-    @OneToOne(fetch = FetchType.LAZY, optional = false)
+    @OneToOne(fetch = FetchType.EAGER, optional = false)
     @JoinColumn(name = "manager_id", nullable = false)
     @ToString.Exclude
     private Employee departmentManager;

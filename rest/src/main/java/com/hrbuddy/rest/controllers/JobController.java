@@ -92,6 +92,7 @@ public class JobController {
 
 
     @DELETE
+    @Produces({MediaType.APPLICATION_JSON, MediaType.APPLICATION_XML})
     @Path("{id}")
     public Response deleteJob(@PathParam("id") int id) {
         try {
@@ -102,7 +103,7 @@ public class JobController {
                     .builder()
                     .message(ResponseMessage.BAD_REQUEST.name())
                     .code(400)
-                    .description("Couldn't delete the job. Invalid ID.")
+                    .description("Couldn't delete the Job record. If the id is correct, You need to delete employees with this job id first.")
                     .build();
             Response response = Response.status(Response.Status.BAD_REQUEST).entity(errorMessage).build();
             throw new WebApplicationException(response);
