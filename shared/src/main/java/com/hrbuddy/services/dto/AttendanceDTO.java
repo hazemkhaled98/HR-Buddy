@@ -31,8 +31,8 @@ public class AttendanceDTO {
 
 
 
-    public static List<AttendanceDTO> of(List<Attendance> jobs){
-        return jobs.stream().map(AttendanceDTO::of).toList();
+    public static List<AttendanceDTO> of(List<Attendance> attendances){
+        return attendances.stream().map(AttendanceDTO::of).toList();
     }
 
 
@@ -50,9 +50,9 @@ public class AttendanceDTO {
 
     public static Attendance toAttendance(AttendanceDTO attendanceDTO){
         return Attendance.builder()
-                .id(attendanceDTO.getId())
-                .date(LocalDate.parse(attendanceDTO.getDate()))
-                .status(attendanceDTO.getStatus())
+                .id(attendanceDTO.id)
+                .date(LocalDate.parse(attendanceDTO.date))
+                .status(attendanceDTO.status)
                 .build();
     }
 

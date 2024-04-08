@@ -47,9 +47,9 @@ public class DepartmentDTO {
 
     public static Department toDepartment(DepartmentDTO departmentDTO){
         return Department.builder()
-                .id(departmentDTO.getId())
-                .name(departmentDTO.getName())
-                .location(departmentDTO.getLocation())
+                .id(departmentDTO.id)
+                .name(departmentDTO.name)
+                .location(departmentDTO.location)
                 .build();
     }
 

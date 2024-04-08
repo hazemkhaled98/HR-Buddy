@@ -50,10 +50,10 @@ public class JobDTO {
 
     public static Job toJob(JobDTO jobDTO){
         return Job.builder()
-                .id(jobDTO.getId())
-                .title(jobDTO.getTitle())
-                .minSalary(jobDTO.getMinSalary())
-                .maxSalary(jobDTO.getMaxSalary())
+                .id(jobDTO.id)
+                .title(jobDTO.title)
+                .minSalary(jobDTO.minSalary)
+                .maxSalary(jobDTO.maxSalary)
                 .build();
     }
 }

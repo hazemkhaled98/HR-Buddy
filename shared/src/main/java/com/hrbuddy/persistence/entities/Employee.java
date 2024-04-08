@@ -7,7 +7,7 @@ import jakarta.validation.constraints.Size;
 import lombok.*;
 
 import java.math.BigDecimal;
-import java.time.Instant;
+import java.time.LocalDate;
 import java.util.LinkedHashSet;
 import java.util.Set;
 
@@ -51,21 +51,21 @@ public class Employee {
 
     @NotNull
     @Column(name = "hire_date", nullable = false)
-    private Instant hireDate;
+    private LocalDate hireDate;
 
     @NotNull
-    @ManyToOne(fetch = FetchType.LAZY, optional = false)
+    @ManyToOne(fetch = FetchType.EAGER, optional = false)
     @JoinColumn(name = "job_id", nullable = false)
     @ToString.Exclude
     private Job job;
 
-    @ManyToOne(fetch = FetchType.LAZY)
+    @ManyToOne(fetch = FetchType.EAGER)
     @JoinColumn(name = "manager_id")
     @ToString.Exclude
     private Employee manager;
 
 
-    @ManyToOne(fetch = FetchType.LAZY)
+    @ManyToOne(fetch = FetchType.EAGER)
     @JoinColumn(name = "department_id")
     @ToString.Exclude
     private Department department;

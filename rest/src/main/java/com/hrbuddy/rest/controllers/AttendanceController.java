@@ -1,7 +1,7 @@
 package com.hrbuddy.rest.controllers;
 
 
-import com.hrbuddy.rest.messages.ErrorMessage;
+import com.hrbuddy.rest.messages.ErrorResponse;
 import com.hrbuddy.rest.messages.ResponseMessage;
 import com.hrbuddy.services.AttendanceService;
 import com.hrbuddy.services.dto.AttendanceDTO;
@@ -30,14 +30,14 @@ public class AttendanceController {
     public Response getAttendanceRecord(@PathParam("id") int id) {
         Optional<AttendanceDTO> attendance = AttendanceService.getAttendanceRecord(id);
         if(attendance.isEmpty()){
-            ErrorMessage errorMessage = ErrorMessage
+            ErrorResponse errorResponse = ErrorResponse
                     .builder()
                     .message(ResponseMessage.NOT_FOUND.name())
                     .code(404)
                     .description("Wrong ID")
                     .build();
             Response response =
-                    Response.status(Response.Status.NOT_FOUND).entity(errorMessage).build();
+                    Response.status(Response.Status.NOT_FOUND).entity(errorResponse).build();
             throw new WebApplicationException(response);
         }
         return Response.ok(attendance.get()).build();
@@ -51,22 +51,22 @@ public class AttendanceController {
             AttendanceDTO createdAttendance = AttendanceService.createAttendance(attendance);
             return Response.status(Response.Status.CREATED).entity(createdAttendance).build();
         } catch (IllegalArgumentException ex){
-            ErrorMessage errorMessage = ErrorMessage
+            ErrorResponse errorResponse = ErrorResponse
                     .builder()
                     .message(ResponseMessage.BAD_REQUEST.name())
                     .code(400)
                     .description(ex.getMessage())
                     .build();
-            Response response = Response.status(Response.Status.BAD_REQUEST).entity(errorMessage).build();
+            Response response = Response.status(Response.Status.BAD_REQUEST).entity(errorResponse).build();
             throw new WebApplicationException(response);
         } catch (Exception e) {
-            ErrorMessage errorMessage = ErrorMessage
+            ErrorResponse errorResponse = ErrorResponse
                     .builder()
                     .message(ResponseMessage.BAD_REQUEST.name())
                     .code(400)
                     .description("Couldn't create the attendance record. Maybe invalid format")
                     .build();
-            Response response = Response.status(Response.Status.BAD_REQUEST).entity(errorMessage).build();
+            Response response = Response.status(Response.Status.BAD_REQUEST).entity(errorResponse).build();
             throw new WebApplicationException(response);
         }
     }
@@ -78,7 +78,7 @@ public class AttendanceController {
             AttendanceDTO updatedAttendance = AttendanceService.updateAttendanceRecord(attendance);
             return Response.ok().entity(updatedAttendance).build();
         } catch (IllegalArgumentException ex){
-            ErrorMessage message = ErrorMessage
+            ErrorResponse message = ErrorResponse
                     .builder()
                     .message(ResponseMessage.BAD_REQUEST.name())
                     .code(400)
@@ -87,8 +87,7 @@ public class AttendanceController {
             Response response = Response.status(Response.Status.BAD_REQUEST).entity(message).build();
             throw new WebApplicationException(response);
         } catch (Exception e) {
-            System.out.println(e.getMessage());
-            ErrorMessage message = ErrorMessage
+            ErrorResponse message = ErrorResponse
                     .builder()
                     .message(ResponseMessage.BAD_REQUEST.name())
                     .code(400)
@@ -108,13 +107,13 @@ public class AttendanceController {
             AttendanceService.deleteAttendanceRecord(id);
             return Response.ok().entity("Attendance record was deleted successfully").build();
         } catch (Exception e) {
-            ErrorMessage errorMessage = ErrorMessage
+            ErrorResponse errorResponse = ErrorResponse
                     .builder()
                     .message(ResponseMessage.BAD_REQUEST.name())
                     .code(400)
                     .description("Couldn't delete the Attendance record. Invalid ID.")
                     .build();
-            Response response = Response.status(Response.Status.BAD_REQUEST).entity(errorMessage).build();
+            Response response = Response.status(Response.Status.BAD_REQUEST).entity(errorResponse).build();
             throw new WebApplicationException(response);
         }
     }

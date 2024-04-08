@@ -52,8 +52,9 @@ public class AttendanceService {
                 throw new IllegalArgumentException("Attendance record was not found");
             if(employee.isEmpty())
                 throw new IllegalArgumentException("There is not employee with id: " + dto.getEmployeeId());
-            Attendance updatedAttendance = attendanceRepository.update(AttendanceDTO.toAttendance(dto));
+            Attendance updatedAttendance = AttendanceDTO.toAttendance(dto);
             updatedAttendance.setEmployee(employee.get());
+            updatedAttendance = attendanceRepository.update(updatedAttendance);
             return AttendanceDTO.of(updatedAttendance);
         });
     }
