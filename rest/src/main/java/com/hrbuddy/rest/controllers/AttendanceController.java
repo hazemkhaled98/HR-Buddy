@@ -73,7 +73,10 @@ public class AttendanceController {
     @DELETE
     @Produces({MediaType.APPLICATION_JSON, MediaType.APPLICATION_XML})
     public Response deleteAllAttendanceRecords(@QueryParam("employeeId") int employeeId) {
+        if(employeeId == 0){
+            throw new BadRequestException("Employee id is required");
+        }
         AttendanceService.deleteAllAttendanceByEmployeeId(employeeId);
-        return Response.ok().entity("All attendance records were deleted successfully").build();
+        return Response.ok().entity("All attendance records for employee with id: " + employeeId + " were deleted successfully").build();
     }
 }
