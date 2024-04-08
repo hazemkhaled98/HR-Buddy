@@ -20,6 +20,17 @@ public class DepartmentController {
     @Produces({MediaType.APPLICATION_JSON, MediaType.APPLICATION_XML})
     public Response getAllDepartments() {
         List<DepartmentDTO> departments = DepartmentService.getAllDepartments();
+        if(departments.isEmpty()){
+            ErrorResponse errorResponse = ErrorResponse
+                    .builder()
+                    .message(ResponseMessage.NOT_FOUND.name())
+                    .code(404)
+                    .description("No departments found")
+                    .build();
+            Response response =
+                    Response.status(Response.Status.NOT_FOUND).entity(errorResponse).build();
+            throw new WebApplicationException(response);
+        }
         GenericEntity<List<DepartmentDTO>> entity = new GenericEntity<>(departments){};
         return Response.ok().entity(entity).build();
     }

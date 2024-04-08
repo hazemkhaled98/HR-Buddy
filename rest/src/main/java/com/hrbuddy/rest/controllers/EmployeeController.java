@@ -9,6 +9,9 @@ import jakarta.ws.rs.core.GenericEntity;
 import jakarta.ws.rs.core.MediaType;
 import jakarta.ws.rs.core.Response;
 
+import java.lang.reflect.Field;
+
+import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
 
@@ -22,9 +25,24 @@ public class EmployeeController {
             @QueryParam("jobId") int jobId,
             @QueryParam("managerId") int managerId,
             @QueryParam("offset") int offset,
-            @QueryParam("limit") int limit
+            @QueryParam("limit") int limit,
+            @QueryParam("fields") String fieldsParam
     ) {
         List<EmployeeDTO> employees = EmployeeService.getAllEmployees(departmentId, jobId, managerId, offset, limit);
+        if(employees.isEmpty()){
+            ErrorResponse errorResponse = ErrorResponse
+                    .builder()
+                    .message(ResponseMessage.NOT_FOUND.name())
+                    .code(404)
+                    .description("No employees found")
+                    .build();
+            Response response =
+                    Response.status(Response.Status.NOT_FOUND).entity(errorResponse).build();
+            throw new WebApplicationException(response);
+        }
+
+        filterEmployees(employees, fieldsParam);
+
         GenericEntity<List<EmployeeDTO>> entity = new GenericEntity<>(employees) {};
         return Response.ok(entity).build();
     }
@@ -32,7 +50,7 @@ public class EmployeeController {
     @GET
     @Path("{id}")
     @Produces({MediaType.APPLICATION_JSON, MediaType.APPLICATION_XML})
-    public Response getEmployee(@PathParam("id") int id) {
+    public Response getEmployee(@PathParam("id") int id, @QueryParam("fields") String fieldsParam) {
         Optional<EmployeeDTO> employee = EmployeeService.getEmployee(id);
         if(employee.isEmpty()){
             ErrorResponse errorResponse = ErrorResponse
@@ -45,6 +63,7 @@ public class EmployeeController {
                     Response.status(Response.Status.NOT_FOUND).entity(errorResponse).build();
             throw new WebApplicationException(response);
         }
+        filterEmployee(employee.get(), fieldsParam);
         return Response.ok(employee.get()).build();
     }
     @POST
@@ -119,6 +138,52 @@ public class EmployeeController {
                     .build();
             Response response = Response.status(Response.Status.BAD_REQUEST).entity(errorResponse).build();
             throw new WebApplicationException(response);
+        }
+    }
+
+    private void filterEmployee(EmployeeDTO employee, String fieldsParams){
+        if(fieldsParams == null || fieldsParams.isEmpty())
+            return;
+        List<String> fields = Arrays.asList(fieldsParams.split(","));
+        List<Field> filterFields = fields.stream().map(field -> {
+            try {
+                return EmployeeDTO.class.getDeclaredField(field);
+            } catch (NoSuchFieldException e) {
+                ErrorResponse errorResponse = ErrorResponse
+                        .builder()
+                        .message(ResponseMessage.BAD_REQUEST.name())
+                        .code(400)
+                        .description("Invalid Fields")
+                        .build();
+                Response response =
+                        Response.status(Response.Status.NOT_FOUND).entity(errorResponse).build();
+                throw new WebApplicationException(response);
+            }
+        }).toList();
+
+        for(Field declaredField : EmployeeDTO.class.getDeclaredFields()){
+            if(!filterFields.contains(declaredField)){
+                try {
+                    declaredField.setAccessible(true);
+                    declaredField.set(employee, null);
+                } catch (IllegalAccessException e) {
+                    ErrorResponse errorResponse = ErrorResponse
+                            .builder()
+                            .message(ResponseMessage.INTERNAL_SERVER_ERROR.name())
+                            .code(500)
+                            .description("The server faced issues returning the result with specified fields")
+                            .build();
+                    Response response =
+                            Response.status(Response.Status.NOT_FOUND).entity(errorResponse).build();
+                    throw new WebApplicationException(response);
+                }
+            }
+        }
+    }
+
+    private void filterEmployees(List<EmployeeDTO> employees, String fieldsParams){
+        for(EmployeeDTO employee : employees){
+            filterEmployee(employee, fieldsParams);
         }
     }
 }

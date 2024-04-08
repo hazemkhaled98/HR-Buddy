@@ -20,6 +20,17 @@ public class AttendanceController {
     @Produces({MediaType.APPLICATION_JSON, MediaType.APPLICATION_XML})
     public Response getAllAttendanceRecords() {
         List<AttendanceDTO> attendances = AttendanceService.getAllAttendanceRecords();
+        if(attendances.isEmpty()){
+            ErrorResponse errorResponse = ErrorResponse
+                    .builder()
+                    .message(ResponseMessage.NOT_FOUND.name())
+                    .code(404)
+                    .description("No attendance records found")
+                    .build();
+            Response response =
+                    Response.status(Response.Status.NOT_FOUND).entity(errorResponse).build();
+            throw new WebApplicationException(response);
+        }
         GenericEntity<List<AttendanceDTO>> entity = new GenericEntity<>(attendances){};
         return Response.ok().entity(entity).build();
     }
