@@ -17,10 +17,16 @@ import java.util.Optional;
 public class EmployeeController {
     @GET
     @Produces({MediaType.APPLICATION_JSON, MediaType.APPLICATION_XML})
-    public Response getAllEmployees() {
-        List<EmployeeDTO> employees = EmployeeService.getAllEmployees();
-        GenericEntity<List<EmployeeDTO>> entity = new GenericEntity<>(employees){};
-        return Response.ok().entity(entity).build();
+    public Response getAllEmployees(
+            @QueryParam("departmentId") int departmentId,
+            @QueryParam("jobId") int jobId,
+            @QueryParam("managerId") int managerId,
+            @QueryParam("offset") int offset,
+            @QueryParam("limit") int limit
+    ) {
+        List<EmployeeDTO> employees = EmployeeService.getAllEmployees(departmentId, jobId, managerId, offset, limit);
+        GenericEntity<List<EmployeeDTO>> entity = new GenericEntity<>(employees) {};
+        return Response.ok(entity).build();
     }
 
     @GET
@@ -41,7 +47,6 @@ public class EmployeeController {
         }
         return Response.ok(employee.get()).build();
     }
-
     @POST
     @Produces({MediaType.APPLICATION_JSON, MediaType.APPLICATION_XML})
     @Consumes({MediaType.APPLICATION_JSON, MediaType.APPLICATION_XML})
@@ -86,7 +91,6 @@ public class EmployeeController {
             Response response = Response.status(Response.Status.BAD_REQUEST).entity(message).build();
             throw new WebApplicationException(response);
         } catch (Exception e) {
-            e.printStackTrace();
             ErrorResponse message = ErrorResponse
                     .builder()
                     .message(ResponseMessage.BAD_REQUEST.name())

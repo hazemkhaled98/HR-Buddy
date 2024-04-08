@@ -51,10 +51,10 @@ public class EmployeeService {
         });
     }
 
-    public static List<EmployeeDTO> getAllEmployees() {
+    public static List<EmployeeDTO> getAllEmployees(int departmentId, int jobId, int managerId, int offset, int limit) {
         return Database.doInTransaction(entityManager -> {
             EmployeeRepository employeeRepository = new EmployeeRepository(entityManager);
-            return EmployeeDTO.of(employeeRepository.getAll());
+            return EmployeeDTO.of(employeeRepository.getAll(departmentId, jobId, managerId, offset, limit));
         });
     }
 
@@ -65,6 +65,7 @@ public class EmployeeService {
             return employee.map(EmployeeDTO::of);
         });
     }
+
 
     public static EmployeeDTO updateEmployee(EmployeeDTO dto){
         return Database.doInTransaction(entityManager -> {
