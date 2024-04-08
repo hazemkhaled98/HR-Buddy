@@ -65,4 +65,11 @@ public class AttendanceService {
             attendanceRepository.deleteById(id);
         });
     }
+
+    public static void deleteAllAttendanceByEmployeeId(int employeeId) {
+        Database.doInTransactionWithoutResult(entityManager -> {
+            AttendanceRepository attendanceRepository = new AttendanceRepository(entityManager);
+            attendanceRepository.deleteByEmployeeId(employeeId);
+        });
+    }
 }

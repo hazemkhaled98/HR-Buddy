@@ -1,8 +1,8 @@
 package com.hrbuddy.rest.controllers;
 
 
-import com.hrbuddy.rest.messages.ErrorResponse;
-import com.hrbuddy.rest.messages.ResponseMessage;
+import com.hrbuddy.rest.exceptions.BadRequestException;
+import com.hrbuddy.rest.exceptions.ResourceNotFoundException;
 import com.hrbuddy.services.JobService;
 import com.hrbuddy.services.dto.JobDTO;
 import jakarta.ws.rs.*;
@@ -22,15 +22,7 @@ public class JobController {
     public Response getAllJobs() {
         List<JobDTO> jobs = JobService.getAllJobs();
         if(jobs.isEmpty()){
-            ErrorResponse errorResponse = ErrorResponse
-                    .builder()
-                    .message(ResponseMessage.NOT_FOUND.name())
-                    .code(404)
-                    .description("No jobs found")
-                    .build();
-            Response response =
-                    Response.status(Response.Status.NOT_FOUND).entity(errorResponse).build();
-            throw new WebApplicationException(response);
+            throw new ResourceNotFoundException("No jobs found");
         }
         GenericEntity<List<JobDTO>> entity = new GenericEntity<>(jobs){};
         return Response.ok().entity(entity).build();
@@ -42,15 +34,7 @@ public class JobController {
     public Response getJob(@PathParam("id") int id) {
         Optional<JobDTO> job = JobService.getJob(id);
         if(job.isEmpty()){
-            ErrorResponse errorResponse = ErrorResponse
-                    .builder()
-                    .message(ResponseMessage.NOT_FOUND.name())
-                    .code(404)
-                    .description("Wrong ID")
-                    .build();
-            Response response =
-                    Response.status(Response.Status.NOT_FOUND).entity(errorResponse).build();
-            throw new WebApplicationException(response);
+            throw new ResourceNotFoundException("No job found for id: " + id);
         }
         return Response.ok(job.get()).build();
     }
@@ -59,19 +43,8 @@ public class JobController {
     @Produces({MediaType.APPLICATION_JSON, MediaType.APPLICATION_XML})
     @Consumes({MediaType.APPLICATION_JSON, MediaType.APPLICATION_XML})
     public Response createJob(JobDTO job) {
-        try {
-            JobDTO createdJob = JobService.createJob(job);
-            return Response.status(Response.Status.CREATED).entity(createdJob).build();
-        } catch (Exception e) {
-            ErrorResponse errorResponse = ErrorResponse
-                    .builder()
-                    .message(ResponseMessage.BAD_REQUEST.name())
-                    .code(400)
-                    .description("Couldn't create the job. Maybe invalid format")
-                    .build();
-            Response response = Response.status(Response.Status.BAD_REQUEST).entity(errorResponse).build();
-            throw new WebApplicationException(response);
-        }
+        JobDTO createdJob = JobService.createJob(job);
+        return Response.status(Response.Status.CREATED).entity(createdJob).build();
     }
     @PUT
     @Produces({MediaType.APPLICATION_JSON, MediaType.APPLICATION_XML})
@@ -81,23 +54,7 @@ public class JobController {
             JobDTO updatedJob = JobService.updateJob(job);
             return Response.ok().entity(updatedJob).build();
         } catch (IllegalArgumentException ex){
-            ErrorResponse message = ErrorResponse
-                    .builder()
-                    .message(ResponseMessage.BAD_REQUEST.name())
-                    .code(400)
-                    .description(ex.getMessage())
-                    .build();
-            Response response = Response.status(Response.Status.BAD_REQUEST).entity(message).build();
-            throw new WebApplicationException(response);
-        } catch (Exception e) {
-            ErrorResponse message = ErrorResponse
-                    .builder()
-                    .message(ResponseMessage.BAD_REQUEST.name())
-                    .code(400)
-                    .description("Couldn't update the job. Maybe invalid format")
-                    .build();
-            Response response = Response.status(Response.Status.BAD_REQUEST).entity(message).build();
-            throw new WebApplicationException(response);
+            throw new BadRequestException(ex.getMessage());
         }
     }
 
@@ -110,14 +67,7 @@ public class JobController {
             JobService.deleteJob(id);
             return Response.ok().entity("Job was deleted successfully").build();
         } catch (Exception e) {
-            ErrorResponse errorResponse = ErrorResponse
-                    .builder()
-                    .message(ResponseMessage.BAD_REQUEST.name())
-                    .code(400)
-                    .description("Couldn't delete the Job record. If the id is correct, You need to delete employees with this job id first.")
-                    .build();
-            Response response = Response.status(Response.Status.BAD_REQUEST).entity(errorResponse).build();
-            throw new WebApplicationException(response);
+            throw new BadRequestException("Couldn't delete the job. If the id is correct you need to delete all the employees assigned to this job first.");
         }
     }
 }

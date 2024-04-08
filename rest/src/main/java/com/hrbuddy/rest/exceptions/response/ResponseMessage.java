@@ -1,4 +1,4 @@
-package com.hrbuddy.rest.messages;
+package com.hrbuddy.rest.exceptions.response;
 
 public enum ResponseMessage {
 

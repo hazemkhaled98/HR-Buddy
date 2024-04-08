@@ -1,8 +1,7 @@
 package com.hrbuddy.rest.controllers;
 
 
-import com.hrbuddy.rest.messages.ErrorResponse;
-import com.hrbuddy.rest.messages.ResponseMessage;
+import com.hrbuddy.rest.exceptions.ResourceNotFoundException;
 import com.hrbuddy.services.DepartmentService;
 import com.hrbuddy.services.dto.DepartmentDTO;
 import jakarta.ws.rs.*;
@@ -21,15 +20,7 @@ public class DepartmentController {
     public Response getAllDepartments() {
         List<DepartmentDTO> departments = DepartmentService.getAllDepartments();
         if(departments.isEmpty()){
-            ErrorResponse errorResponse = ErrorResponse
-                    .builder()
-                    .message(ResponseMessage.NOT_FOUND.name())
-                    .code(404)
-                    .description("No departments found")
-                    .build();
-            Response response =
-                    Response.status(Response.Status.NOT_FOUND).entity(errorResponse).build();
-            throw new WebApplicationException(response);
+            throw new ResourceNotFoundException("No departments found");
         }
         GenericEntity<List<DepartmentDTO>> entity = new GenericEntity<>(departments){};
         return Response.ok().entity(entity).build();
@@ -41,15 +32,7 @@ public class DepartmentController {
     public Response getDepartment(@PathParam("id") int id) {
         Optional<DepartmentDTO> department = DepartmentService.getDepartment(id);
         if(department.isEmpty()){
-            ErrorResponse errorResponse = ErrorResponse
-                    .builder()
-                    .message(ResponseMessage.NOT_FOUND.name())
-                    .code(404)
-                    .description("Wrong ID")
-                    .build();
-            Response response =
-                    Response.status(Response.Status.NOT_FOUND).entity(errorResponse).build();
-            throw new WebApplicationException(response);
+            throw new ResourceNotFoundException("No department found for id: " + id);
         }
         return Response.ok(department.get()).build();
     }
@@ -62,23 +45,7 @@ public class DepartmentController {
             DepartmentDTO  createdDepartment = DepartmentService.createDepartment(department);
             return Response.status(Response.Status.CREATED).entity(createdDepartment).build();
         } catch (IllegalArgumentException ex){
-            ErrorResponse errorResponse = ErrorResponse
-                    .builder()
-                    .message(ResponseMessage.BAD_REQUEST.name())
-                    .code(400)
-                    .description(ex.getMessage())
-                    .build();
-            Response response = Response.status(Response.Status.BAD_REQUEST).entity(errorResponse).build();
-            throw new WebApplicationException(response);
-        } catch (Exception e) {
-            ErrorResponse errorResponse = ErrorResponse
-                    .builder()
-                    .message(ResponseMessage.BAD_REQUEST.name())
-                    .code(400)
-                    .description("Couldn't create the department record. Maybe invalid format")
-                    .build();
-            Response response = Response.status(Response.Status.BAD_REQUEST).entity(errorResponse).build();
-            throw new WebApplicationException(response);
+            throw new BadRequestException(ex.getMessage());
         }
     }
     @PUT
@@ -89,23 +56,7 @@ public class DepartmentController {
             DepartmentDTO updatedDepartment = DepartmentService.updateDepartment(department);
             return Response.ok().entity(updatedDepartment).build();
         } catch (IllegalArgumentException ex){
-            ErrorResponse message = ErrorResponse
-                    .builder()
-                    .message(ResponseMessage.BAD_REQUEST.name())
-                    .code(400)
-                    .description(ex.getMessage())
-                    .build();
-            Response response = Response.status(Response.Status.BAD_REQUEST).entity(message).build();
-            throw new WebApplicationException(response);
-        } catch (Exception e) {
-            ErrorResponse message = ErrorResponse
-                    .builder()
-                    .message(ResponseMessage.BAD_REQUEST.name())
-                    .code(400)
-                    .description("Couldn't update the department record. Maybe invalid format")
-                    .build();
-            Response response = Response.status(Response.Status.BAD_REQUEST).entity(message).build();
-            throw new WebApplicationException(response);
+            throw new BadRequestException(ex.getMessage());
         }
     }
 
@@ -118,14 +69,7 @@ public class DepartmentController {
             DepartmentService.deleteDepartment(id);
             return Response.ok().entity("Department record was deleted successfully").build();
         } catch (Exception e) {
-            ErrorResponse errorResponse = ErrorResponse
-                    .builder()
-                    .message(ResponseMessage.BAD_REQUEST.name())
-                    .code(400)
-                    .description("Couldn't delete the department record. If the id is correct, You need to move or delete employees in this department first.")
-                    .build();
-            Response response = Response.status(Response.Status.BAD_REQUEST).entity(errorResponse).build();
-            throw new WebApplicationException(response);
+            throw new ResourceNotFoundException("Couldn't delete the department record. If the id is correct, You need to move or delete employees in this department first.");
         }
     }
 }

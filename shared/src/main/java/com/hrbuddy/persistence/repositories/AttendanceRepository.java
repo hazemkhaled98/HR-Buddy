@@ -10,4 +10,9 @@ public class AttendanceRepository extends Repository<Attendance> {
         super(entityManager);
         setType(Attendance.class);
     }
+
+    public void deleteByEmployeeId(int employeeId) {
+        String sql = "DELETE FROM attendance WHERE employee_id = ?";
+        entityManager.createNativeQuery(sql).setParameter(1, employeeId).executeUpdate();
+    }
 }

@@ -1,7 +1,8 @@
 package com.hrbuddy.rest.controllers;
 
-import com.hrbuddy.rest.messages.ErrorResponse;
-import com.hrbuddy.rest.messages.ResponseMessage;
+import com.hrbuddy.rest.exceptions.BadRequestException;
+import com.hrbuddy.rest.exceptions.InternalServerErrorException;
+import com.hrbuddy.rest.exceptions.ResourceNotFoundException;
 import com.hrbuddy.services.EmployeeService;
 import com.hrbuddy.services.dto.EmployeeDTO;
 import jakarta.ws.rs.*;
@@ -30,15 +31,7 @@ public class EmployeeController {
     ) {
         List<EmployeeDTO> employees = EmployeeService.getAllEmployees(departmentId, jobId, managerId, offset, limit);
         if(employees.isEmpty()){
-            ErrorResponse errorResponse = ErrorResponse
-                    .builder()
-                    .message(ResponseMessage.NOT_FOUND.name())
-                    .code(404)
-                    .description("No employees found")
-                    .build();
-            Response response =
-                    Response.status(Response.Status.NOT_FOUND).entity(errorResponse).build();
-            throw new WebApplicationException(response);
+            throw new ResourceNotFoundException("No employees found");
         }
 
         filterEmployees(employees, fieldsParam);
@@ -53,15 +46,7 @@ public class EmployeeController {
     public Response getEmployee(@PathParam("id") int id, @QueryParam("fields") String fieldsParam) {
         Optional<EmployeeDTO> employee = EmployeeService.getEmployee(id);
         if(employee.isEmpty()){
-            ErrorResponse errorResponse = ErrorResponse
-                    .builder()
-                    .message(ResponseMessage.NOT_FOUND.name())
-                    .code(404)
-                    .description("Wrong ID")
-                    .build();
-            Response response =
-                    Response.status(Response.Status.NOT_FOUND).entity(errorResponse).build();
-            throw new WebApplicationException(response);
+            throw new ResourceNotFoundException("No employee found for id: " + id);
         }
         filterEmployee(employee.get(), fieldsParam);
         return Response.ok(employee.get()).build();
@@ -74,23 +59,7 @@ public class EmployeeController {
             EmployeeDTO createdEmployee = EmployeeService.createEmployee(employee);
             return Response.status(Response.Status.CREATED).entity(createdEmployee).build();
         } catch (IllegalArgumentException ex){
-            ErrorResponse errorResponse = ErrorResponse
-                    .builder()
-                    .message(ResponseMessage.BAD_REQUEST.name())
-                    .code(400)
-                    .description(ex.getMessage())
-                    .build();
-            Response response = Response.status(Response.Status.BAD_REQUEST).entity(errorResponse).build();
-            throw new WebApplicationException(response);
-        } catch (Exception e) {
-            ErrorResponse errorResponse = ErrorResponse
-                    .builder()
-                    .message(ResponseMessage.BAD_REQUEST.name())
-                    .code(400)
-                    .description("Couldn't create the employee record. Maybe invalid format")
-                    .build();
-            Response response = Response.status(Response.Status.BAD_REQUEST).entity(errorResponse).build();
-            throw new WebApplicationException(response);
+            throw new ResourceNotFoundException(ex.getMessage());
         }
     }
     @PUT
@@ -101,23 +70,7 @@ public class EmployeeController {
             EmployeeDTO updatedEmployee = EmployeeService.updateEmployee(employee);
             return Response.ok().entity(updatedEmployee).build();
         } catch (IllegalArgumentException ex){
-            ErrorResponse message = ErrorResponse
-                    .builder()
-                    .message(ResponseMessage.BAD_REQUEST.name())
-                    .code(400)
-                    .description(ex.getMessage())
-                    .build();
-            Response response = Response.status(Response.Status.BAD_REQUEST).entity(message).build();
-            throw new WebApplicationException(response);
-        } catch (Exception e) {
-            ErrorResponse message = ErrorResponse
-                    .builder()
-                    .message(ResponseMessage.BAD_REQUEST.name())
-                    .code(400)
-                    .description("Couldn't update the employee record. Maybe invalid format")
-                    .build();
-            Response response = Response.status(Response.Status.BAD_REQUEST).entity(message).build();
-            throw new WebApplicationException(response);
+           throw new ResourceNotFoundException(ex.getMessage());
         }
     }
 
@@ -130,14 +83,7 @@ public class EmployeeController {
             EmployeeService.deleteEmployee(id);
             return Response.ok().entity("Employee record was deleted successfully").build();
         } catch (Exception e) {
-            ErrorResponse errorResponse = ErrorResponse
-                    .builder()
-                    .message(ResponseMessage.BAD_REQUEST.name())
-                    .code(400)
-                    .description("Couldn't delete the Employee record. If the id is correct you need to delete all the attendance record first. Also if he is a manager you need to assign the department to another manager and update the records of the managed employees")
-                    .build();
-            Response response = Response.status(Response.Status.BAD_REQUEST).entity(errorResponse).build();
-            throw new WebApplicationException(response);
+            throw new BadRequestException("Couldn't delete the Employee record. If the id is correct you need to delete all the attendance record first. Also if he is a manager you need to assign the department to another manager and update the records of the managed employees");
         }
     }
 
@@ -149,15 +95,7 @@ public class EmployeeController {
             try {
                 return EmployeeDTO.class.getDeclaredField(field);
             } catch (NoSuchFieldException e) {
-                ErrorResponse errorResponse = ErrorResponse
-                        .builder()
-                        .message(ResponseMessage.BAD_REQUEST.name())
-                        .code(400)
-                        .description("Invalid Fields")
-                        .build();
-                Response response =
-                        Response.status(Response.Status.NOT_FOUND).entity(errorResponse).build();
-                throw new WebApplicationException(response);
+                throw new BadRequestException("No such field: " + field);
             }
         }).toList();
 
@@ -167,15 +105,7 @@ public class EmployeeController {
                     declaredField.setAccessible(true);
                     declaredField.set(employee, null);
                 } catch (IllegalAccessException e) {
-                    ErrorResponse errorResponse = ErrorResponse
-                            .builder()
-                            .message(ResponseMessage.INTERNAL_SERVER_ERROR.name())
-                            .code(500)
-                            .description("The server faced issues returning the result with specified fields")
-                            .build();
-                    Response response =
-                            Response.status(Response.Status.NOT_FOUND).entity(errorResponse).build();
-                    throw new WebApplicationException(response);
+                    throw new InternalServerErrorException("could not apply filter to employee");
                 }
             }
         }

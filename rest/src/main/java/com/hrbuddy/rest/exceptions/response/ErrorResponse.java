@@ -1,4 +1,4 @@
-package com.hrbuddy.rest.messages;
+package com.hrbuddy.rest.exceptions.response;
 
 import jakarta.xml.bind.annotation.XmlAccessType;
 import jakarta.xml.bind.annotation.XmlAccessorType;

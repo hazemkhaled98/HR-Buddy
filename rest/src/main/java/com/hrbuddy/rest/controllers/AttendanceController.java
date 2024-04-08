@@ -1,8 +1,7 @@
 package com.hrbuddy.rest.controllers;
 
 
-import com.hrbuddy.rest.messages.ErrorResponse;
-import com.hrbuddy.rest.messages.ResponseMessage;
+import com.hrbuddy.rest.exceptions.ResourceNotFoundException;
 import com.hrbuddy.services.AttendanceService;
 import com.hrbuddy.services.dto.AttendanceDTO;
 import jakarta.ws.rs.*;
@@ -21,15 +20,7 @@ public class AttendanceController {
     public Response getAllAttendanceRecords() {
         List<AttendanceDTO> attendances = AttendanceService.getAllAttendanceRecords();
         if(attendances.isEmpty()){
-            ErrorResponse errorResponse = ErrorResponse
-                    .builder()
-                    .message(ResponseMessage.NOT_FOUND.name())
-                    .code(404)
-                    .description("No attendance records found")
-                    .build();
-            Response response =
-                    Response.status(Response.Status.NOT_FOUND).entity(errorResponse).build();
-            throw new WebApplicationException(response);
+            throw new ResourceNotFoundException("No attendance records found");
         }
         GenericEntity<List<AttendanceDTO>> entity = new GenericEntity<>(attendances){};
         return Response.ok().entity(entity).build();
@@ -41,15 +32,7 @@ public class AttendanceController {
     public Response getAttendanceRecord(@PathParam("id") int id) {
         Optional<AttendanceDTO> attendance = AttendanceService.getAttendanceRecord(id);
         if(attendance.isEmpty()){
-            ErrorResponse errorResponse = ErrorResponse
-                    .builder()
-                    .message(ResponseMessage.NOT_FOUND.name())
-                    .code(404)
-                    .description("Wrong ID")
-                    .build();
-            Response response =
-                    Response.status(Response.Status.NOT_FOUND).entity(errorResponse).build();
-            throw new WebApplicationException(response);
+            throw new ResourceNotFoundException("No attendance record found for id: " + id);
         }
         return Response.ok(attendance.get()).build();
     }
@@ -62,23 +45,7 @@ public class AttendanceController {
             AttendanceDTO createdAttendance = AttendanceService.createAttendance(attendance);
             return Response.status(Response.Status.CREATED).entity(createdAttendance).build();
         } catch (IllegalArgumentException ex){
-            ErrorResponse errorResponse = ErrorResponse
-                    .builder()
-                    .message(ResponseMessage.BAD_REQUEST.name())
-                    .code(400)
-                    .description(ex.getMessage())
-                    .build();
-            Response response = Response.status(Response.Status.BAD_REQUEST).entity(errorResponse).build();
-            throw new WebApplicationException(response);
-        } catch (Exception e) {
-            ErrorResponse errorResponse = ErrorResponse
-                    .builder()
-                    .message(ResponseMessage.BAD_REQUEST.name())
-                    .code(400)
-                    .description("Couldn't create the attendance record. Maybe invalid format")
-                    .build();
-            Response response = Response.status(Response.Status.BAD_REQUEST).entity(errorResponse).build();
-            throw new WebApplicationException(response);
+            throw new BadRequestException(ex.getMessage());
         }
     }
     @PUT
@@ -89,43 +56,24 @@ public class AttendanceController {
             AttendanceDTO updatedAttendance = AttendanceService.updateAttendanceRecord(attendance);
             return Response.ok().entity(updatedAttendance).build();
         } catch (IllegalArgumentException ex){
-            ErrorResponse message = ErrorResponse
-                    .builder()
-                    .message(ResponseMessage.BAD_REQUEST.name())
-                    .code(400)
-                    .description(ex.getMessage())
-                    .build();
-            Response response = Response.status(Response.Status.BAD_REQUEST).entity(message).build();
-            throw new WebApplicationException(response);
-        } catch (Exception e) {
-            ErrorResponse message = ErrorResponse
-                    .builder()
-                    .message(ResponseMessage.BAD_REQUEST.name())
-                    .code(400)
-                    .description("Couldn't update the attendance record. Maybe invalid format")
-                    .build();
-            Response response = Response.status(Response.Status.BAD_REQUEST).entity(message).build();
-            throw new WebApplicationException(response);
+            throw new BadRequestException(ex.getMessage());
         }
     }
+
 
 
     @DELETE
     @Path("{id}")
     @Produces({MediaType.APPLICATION_JSON, MediaType.APPLICATION_XML})
     public Response deleteAttendanceRecord(@PathParam("id") int id) {
-        try {
-            AttendanceService.deleteAttendanceRecord(id);
-            return Response.ok().entity("Attendance record was deleted successfully").build();
-        } catch (Exception e) {
-            ErrorResponse errorResponse = ErrorResponse
-                    .builder()
-                    .message(ResponseMessage.BAD_REQUEST.name())
-                    .code(400)
-                    .description("Couldn't delete the Attendance record. Invalid ID.")
-                    .build();
-            Response response = Response.status(Response.Status.BAD_REQUEST).entity(errorResponse).build();
-            throw new WebApplicationException(response);
-        }
+        AttendanceService.deleteAttendanceRecord(id);
+        return Response.ok().entity("Attendance record was deleted successfully").build();
+    }
+
+    @DELETE
+    @Produces({MediaType.APPLICATION_JSON, MediaType.APPLICATION_XML})
+    public Response deleteAllAttendanceRecords(@QueryParam("employeeId") int employeeId) {
+        AttendanceService.deleteAllAttendanceByEmployeeId(employeeId);
+        return Response.ok().entity("All attendance records were deleted successfully").build();
     }
 }
