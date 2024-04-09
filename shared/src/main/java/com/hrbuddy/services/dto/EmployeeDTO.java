@@ -2,7 +2,7 @@ package com.hrbuddy.services.dto;
 
 
 
-import com.hrbuddy.persistence.entities.Attendance;
+
 import com.hrbuddy.persistence.entities.Employee;
 import jakarta.xml.bind.annotation.XmlAccessType;
 import jakarta.xml.bind.annotation.XmlAccessorType;
@@ -72,7 +72,7 @@ public class EmployeeDTO {
                 .hireDate(employee.getHireDate().toString())
                 .jobId(employee.getJob().getId())
                 .managerId(employee.getManager() != null ? employee.getManager().getId() : null)
-                .departmentId(employee.getDepartment().getId())
+                .departmentId(employee.getDepartment() != null ? employee.getDepartment().getId() : null)
                 .bonus(employee.getBonus())
                 .deduction(employee.getDeduction())
                 .build();

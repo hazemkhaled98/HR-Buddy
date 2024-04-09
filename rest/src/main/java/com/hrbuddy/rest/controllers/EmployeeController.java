@@ -19,7 +19,7 @@ public class EmployeeController {
     @Produces({MediaType.APPLICATION_JSON, MediaType.APPLICATION_XML})
     public Response getAllEmployees(@BeanParam EmployeesFilters filters, @Context HttpHeaders headers) {
         SecurityManager.authorizeUser(headers);
-        List<EmployeeDTO> employees = EmployeeService.getAllEmployees(filters.getDepartmentId(), filters.getJobId(), filters.getManagerId(), filters.getOffset(), filters.getOffset());
+        List<EmployeeDTO> employees = EmployeeService.getAllEmployees(filters.getDepartmentId(), filters.getJobId(), filters.getManagerId(), filters.getOffset(), filters.getLimit());
 
 
         filterEmployees(employees, filters.getFieldsParam());
