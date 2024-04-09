@@ -3,12 +3,11 @@ package com.hrbuddy.rest.controllers;
 import com.hrbuddy.rest.exceptions.BadRequestException;
 import com.hrbuddy.rest.exceptions.InternalServerErrorException;
 import com.hrbuddy.rest.exceptions.ResourceNotFoundException;
+import com.hrbuddy.rest.security.SecurityManager;
 import com.hrbuddy.services.EmployeeService;
 import com.hrbuddy.services.dto.EmployeeDTO;
 import jakarta.ws.rs.*;
-import jakarta.ws.rs.core.GenericEntity;
-import jakarta.ws.rs.core.MediaType;
-import jakarta.ws.rs.core.Response;
+import jakarta.ws.rs.core.*;
 
 import java.lang.reflect.Field;
 
@@ -27,8 +26,10 @@ public class EmployeeController {
             @QueryParam("managerId") int managerId,
             @QueryParam("offset") int offset,
             @QueryParam("limit") int limit,
-            @QueryParam("fields") String fieldsParam
+            @QueryParam("fields") String fieldsParam,
+            @Context HttpHeaders headers
     ) {
+        SecurityManager.authorizeUser(headers);
         List<EmployeeDTO> employees = EmployeeService.getAllEmployees(departmentId, jobId, managerId, offset, limit);
         if(employees.isEmpty()){
             throw new ResourceNotFoundException("No employees found");
@@ -43,7 +44,8 @@ public class EmployeeController {
     @GET
     @Path("{id}")
     @Produces({MediaType.APPLICATION_JSON, MediaType.APPLICATION_XML})
-    public Response getEmployee(@PathParam("id") int id, @QueryParam("fields") String fieldsParam) {
+    public Response getEmployee(@PathParam("id") int id, @QueryParam("fields") String fieldsParam, @Context HttpHeaders headers) {
+        SecurityManager.authorizeUser(headers);
         Optional<EmployeeDTO> employee = EmployeeService.getEmployee(id);
         if(employee.isEmpty()){
             throw new ResourceNotFoundException("No employee found for id: " + id);
@@ -54,7 +56,8 @@ public class EmployeeController {
     @POST
     @Produces({MediaType.APPLICATION_JSON, MediaType.APPLICATION_XML})
     @Consumes({MediaType.APPLICATION_JSON, MediaType.APPLICATION_XML})
-    public Response createEmployee(EmployeeDTO employee) {
+    public Response createEmployee(EmployeeDTO employee, @Context HttpHeaders headers) {
+        SecurityManager.authorizeAdmin(headers);
         try {
             EmployeeDTO createdEmployee = EmployeeService.createEmployee(employee);
             return Response.status(Response.Status.CREATED).entity(createdEmployee).build();
@@ -65,7 +68,8 @@ public class EmployeeController {
     @PUT
     @Produces({MediaType.APPLICATION_JSON, MediaType.APPLICATION_XML})
     @Consumes({MediaType.APPLICATION_JSON, MediaType.APPLICATION_XML})
-    public Response updateEmployee(EmployeeDTO employee) {
+    public Response updateEmployee(EmployeeDTO employee, @Context HttpHeaders headers) {
+        SecurityManager.authorizeAdmin(headers);
         try {
             EmployeeDTO updatedEmployee = EmployeeService.updateEmployee(employee);
             return Response.ok().entity(updatedEmployee).build();
@@ -78,7 +82,8 @@ public class EmployeeController {
     @DELETE
     @Path("{id}")
     @Produces({MediaType.APPLICATION_JSON, MediaType.APPLICATION_XML})
-    public Response deleteEmployee(@PathParam("id") int id) {
+    public Response deleteEmployee(@PathParam("id") int id, @Context HttpHeaders headers) {
+        SecurityManager.authorizeAdmin(headers);
         try {
             EmployeeService.deleteEmployee(id);
             return Response.ok().entity("Employee record was deleted successfully").build();

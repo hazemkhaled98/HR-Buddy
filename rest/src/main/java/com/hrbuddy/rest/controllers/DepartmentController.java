@@ -2,12 +2,11 @@ package com.hrbuddy.rest.controllers;
 
 
 import com.hrbuddy.rest.exceptions.ResourceNotFoundException;
+import com.hrbuddy.rest.security.SecurityManager;
 import com.hrbuddy.services.DepartmentService;
 import com.hrbuddy.services.dto.DepartmentDTO;
 import jakarta.ws.rs.*;
-import jakarta.ws.rs.core.GenericEntity;
-import jakarta.ws.rs.core.MediaType;
-import jakarta.ws.rs.core.Response;
+import jakarta.ws.rs.core.*;
 
 import java.util.List;
 import java.util.Optional;
@@ -17,7 +16,11 @@ public class DepartmentController {
 
     @GET
     @Produces({MediaType.APPLICATION_JSON, MediaType.APPLICATION_XML})
-    public Response getAllDepartments() {
+    public Response getAllDepartments(@Context HttpHeaders headers) {
+
+        SecurityManager.authorizeUser(headers);
+
+
         List<DepartmentDTO> departments = DepartmentService.getAllDepartments();
         if(departments.isEmpty()){
             throw new ResourceNotFoundException("No departments found");
@@ -29,7 +32,8 @@ public class DepartmentController {
     @GET
     @Path("{id}")
     @Produces({MediaType.APPLICATION_JSON, MediaType.APPLICATION_XML})
-    public Response getDepartment(@PathParam("id") int id) {
+    public Response getDepartment(@PathParam("id") int id, @Context HttpHeaders headers) {
+        SecurityManager.authorizeUser(headers);
         Optional<DepartmentDTO> department = DepartmentService.getDepartment(id);
         if(department.isEmpty()){
             throw new ResourceNotFoundException("No department found for id: " + id);
@@ -40,7 +44,8 @@ public class DepartmentController {
     @POST
     @Produces({MediaType.APPLICATION_JSON, MediaType.APPLICATION_XML})
     @Consumes({MediaType.APPLICATION_JSON, MediaType.APPLICATION_XML})
-    public Response createDepartment(DepartmentDTO department) {
+    public Response createDepartment(DepartmentDTO department, @Context HttpHeaders headers) {
+        SecurityManager.authorizeAdmin(headers);
         try {
             DepartmentDTO  createdDepartment = DepartmentService.createDepartment(department);
             return Response.status(Response.Status.CREATED).entity(createdDepartment).build();
@@ -51,7 +56,8 @@ public class DepartmentController {
     @PUT
     @Produces({MediaType.APPLICATION_JSON, MediaType.APPLICATION_XML})
     @Consumes({MediaType.APPLICATION_JSON, MediaType.APPLICATION_XML})
-    public Response updateDepartment(DepartmentDTO department) {
+    public Response updateDepartment(DepartmentDTO department, @Context HttpHeaders headers) {
+        SecurityManager.authorizeAdmin(headers);
         try {
             DepartmentDTO updatedDepartment = DepartmentService.updateDepartment(department);
             return Response.ok().entity(updatedDepartment).build();
@@ -64,7 +70,8 @@ public class DepartmentController {
     @DELETE
     @Produces({MediaType.APPLICATION_JSON, MediaType.APPLICATION_XML})
     @Path("{id}")
-    public Response deleteDepartment(@PathParam("id") int id) {
+    public Response deleteDepartment(@PathParam("id") int id, @Context HttpHeaders headers) {
+        SecurityManager.authorizeAdmin(headers);
         try {
             DepartmentService.deleteDepartment(id);
             return Response.ok().entity("Department record was deleted successfully").build();

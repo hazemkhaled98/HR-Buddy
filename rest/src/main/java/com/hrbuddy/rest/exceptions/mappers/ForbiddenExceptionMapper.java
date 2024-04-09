@@ -5,9 +5,10 @@ import com.hrbuddy.rest.exceptions.response.ErrorResponse;
 import com.hrbuddy.rest.exceptions.response.ResponseMessage;
 import jakarta.ws.rs.core.Response;
 import jakarta.ws.rs.ext.ExceptionMapper;
+import jakarta.ws.rs.ext.Provider;
 
 
-
+@Provider
 public class ForbiddenExceptionMapper implements ExceptionMapper<ForbiddenException> {
 
 

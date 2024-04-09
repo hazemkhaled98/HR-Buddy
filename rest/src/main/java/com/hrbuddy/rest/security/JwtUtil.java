@@ -1,6 +1,6 @@
-package com.hrbuddy.rest.utils;
+package com.hrbuddy.rest.security;
 
-
+import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.SignatureAlgorithm;
 
@@ -9,7 +9,7 @@ import java.io.InputStream;
 import java.util.Date;
 import java.util.Properties;
 
-public class JwtUtil {
+class JwtUtil {
 
     private static String secretKey;
 
@@ -39,5 +39,28 @@ public class JwtUtil {
                 .signWith(SignatureAlgorithm.HS256, secretKey)
                 .compact();
     }
-}
 
+    public static boolean validateToken(String token) {
+        try {
+            Claims claims = Jwts.parser()
+                    .setSigningKey(secretKey)
+                    .build()
+                    .parseClaimsJws(token)
+                    .getBody();
+            return claims.getSubject() != null;
+        } catch (Exception e) {
+            return false;
+        }
+    }
+
+    public static boolean isAdmin(String token) {
+        return validateToken(token) && "admin".equals(Jwts.parser()
+                .setSigningKey(secretKey)
+                .build()
+                .parseClaimsJws(token)
+                .getBody()
+                .getSubject());
+    }
+
+
+}

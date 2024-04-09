@@ -2,7 +2,7 @@ package com.hrbuddy.rest.controllers;
 
 
 import com.hrbuddy.rest.exceptions.UnauthorizedException;
-import com.hrbuddy.rest.utils.JwtUtil;
+import com.hrbuddy.rest.security.SecurityManager;
 import com.hrbuddy.services.UserService;
 import com.hrbuddy.services.dto.UserDTO;
 import jakarta.ws.rs.Consumes;
@@ -21,7 +21,7 @@ public class UserController {
     public UserDTO login(UserDTO user){
         try{
             UserDTO loggedUser = UserService.login(user);
-            String token = JwtUtil.generateToken(loggedUser.getRole());
+            String token = SecurityManager.generateToken(loggedUser.getRole());
             loggedUser.setToken(token);
             return loggedUser;
         } catch (IllegalArgumentException e) {
@@ -36,7 +36,7 @@ public class UserController {
     @Consumes("application/json")
     public UserDTO register(UserDTO user){
         UserDTO registeredUser = UserService.register(user);
-        String token = JwtUtil.generateToken(registeredUser.getRole());
+        String token = SecurityManager.generateToken(registeredUser.getRole());
         registeredUser.setToken(token);
         return registeredUser;
     }
