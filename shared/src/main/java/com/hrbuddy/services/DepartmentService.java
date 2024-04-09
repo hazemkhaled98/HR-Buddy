@@ -16,6 +16,7 @@ public class DepartmentService {
     }
 
     public static DepartmentDTO createDepartment(DepartmentDTO dto) {
+        validateDTO(dto);
         return Database.doInTransaction(entityManager -> {
             DepartmentRepository  departmentRepository = new DepartmentRepository(entityManager);
             EmployeeRepository employeeRepository = new EmployeeRepository(entityManager);
@@ -44,9 +45,12 @@ public class DepartmentService {
     }
 
     public static DepartmentDTO updateDepartment(DepartmentDTO dto){
+        validateDTO(dto);
         return Database.doInTransaction(entityManager -> {
             DepartmentRepository  departmentRepository = new DepartmentRepository(entityManager);
             EmployeeRepository employeeRepository = new EmployeeRepository(entityManager);
+            if(dto.getId() == null)
+                throw new IllegalArgumentException("Department Id is required");
             Department department = departmentRepository.get(dto.getId())
                     .orElseThrow(() -> new IllegalArgumentException("There is no department with id: " + dto.getId()));
             Employee manager = employeeRepository.get(dto.getManagerId())
@@ -66,6 +70,11 @@ public class DepartmentService {
         }  catch (Exception e) {
             throw new IllegalArgumentException("Can't delete department with id: " + id + ". You need to update all the employees record associated with this department first.");
         }
+    }
+
+    private static void validateDTO(DepartmentDTO dto) {
+        if(dto.getManagerId() == null || dto.getName() == null || dto.getLocation() == null)
+            throw new IllegalArgumentException("Manager Id ,Department location and Department Name are required");
     }
 
 }

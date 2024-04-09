@@ -17,6 +17,7 @@ public class VacationService {
     }
 
     public static VacationDTO createVacation(VacationDTO dto) {
+        validateDTO(dto);
         return Database.doInTransaction(entityManager -> {
             VacationRepository vacationRepository = new VacationRepository(entityManager);
             EmployeeRepository employeeRepository = new EmployeeRepository(entityManager);
@@ -53,9 +54,12 @@ public class VacationService {
     }
 
     public static VacationDTO updateVacation(VacationDTO dto){
+        validateDTO(dto);
         return Database.doInTransaction(entityManager -> {
             VacationRepository vacationRepository = new VacationRepository(entityManager);
             EmployeeRepository employeeRepository = new EmployeeRepository(entityManager);
+            if(dto.getId() == null)
+                throw new IllegalArgumentException("Id is required");
             Vacation vacation = vacationRepository.get(dto.getId())
                     .orElseThrow(() ->  new IllegalArgumentException("There is no vacation with id" + dto.getId()));
 
@@ -83,6 +87,12 @@ public class VacationService {
             VacationRepository vacationRepository = new VacationRepository(entityManager);
             vacationRepository.deleteByEmployeeId(employeeId);
         });
+    }
+
+    private static void validateDTO(VacationDTO dto){
+        if(dto.getEmployeeId() == null || dto.getFrom() == null || dto.getTo() == null){
+            throw new IllegalArgumentException("Employee Id, Start and End dates are required");
+        }
     }
 }
 

@@ -19,6 +19,8 @@ public class EmployeeService {
     }
 
     public static EmployeeDTO createEmployee(EmployeeDTO dto) {
+        validateDTO(dto);
+        validateDTO(dto);
         return Database.doInTransaction(entityManager -> {
             JobRepository jobRepository = new JobRepository(entityManager);
             DepartmentRepository departmentRepository = new DepartmentRepository(entityManager);
@@ -69,10 +71,13 @@ public class EmployeeService {
 
 
     public static EmployeeDTO updateEmployee(EmployeeDTO dto){
+        validateDTO(dto);
         return Database.doInTransaction(entityManager -> {
             JobRepository jobRepository = new JobRepository(entityManager);
             DepartmentRepository departmentRepository = new DepartmentRepository(entityManager);
             EmployeeRepository employeeRepository = new EmployeeRepository(entityManager);
+            if(dto.getId() == null)
+                throw new IllegalArgumentException("Employee Id is required");
             Employee employee = employeeRepository.get(dto.getId())
                     .orElseThrow(() -> new IllegalArgumentException("There is not employee with id: " + dto.getId()));
 
@@ -111,6 +116,15 @@ public class EmployeeService {
             });
         } catch (RuntimeException e) {
             throw new IllegalArgumentException("Can't delete employee with id: " + id + ". You need to delete all the attendance and vacations first. Also if this employee is a manager, You need to update the managed department and employees records.");
+        }
+    }
+
+    private static void validateDTO(EmployeeDTO dto) {
+        if (dto.getFirstName() == null || dto.getLastName() == null || dto.getEmail() == null
+                || dto.getBonus() == null || dto.getDeduction() == null
+                || dto.getSalary() == null || dto.getHireDate() == null
+                || dto.getJobId() == null || dto.getPhoneNumber() == null) {
+            throw new IllegalArgumentException("First name, last name, email, bonus, deduction, salary, hire date, job id and phone number are required.");
         }
     }
 }

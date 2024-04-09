@@ -16,6 +16,7 @@ public class AttendanceService {
     }
 
     public static AttendanceDTO createAttendance(AttendanceDTO dto) {
+        validateDTO(dto);
         return Database.doInTransaction(entityManager -> {
             AttendanceRepository attendanceRepository = new AttendanceRepository(entityManager);
             EmployeeRepository employeeRepository = new EmployeeRepository(entityManager);
@@ -26,6 +27,7 @@ public class AttendanceService {
             return AttendanceDTO.of(attendanceRepository.create(attendance));
         });
     }
+
 
     public static List<AttendanceDTO> getAllAttendanceRecords(int employeeId) {
         return Database.doInTransaction(entityManager -> {
@@ -44,9 +46,12 @@ public class AttendanceService {
     }
 
     public static AttendanceDTO updateAttendanceRecord(AttendanceDTO dto){
+        validateDTO(dto);
         return Database.doInTransaction(entityManager -> {
             AttendanceRepository attendanceRepository = new AttendanceRepository(entityManager);
             EmployeeRepository employeeRepository = new EmployeeRepository(entityManager);
+            if(dto.getId() == null)
+                throw new IllegalArgumentException("Id is required");
             Attendance attendance = attendanceRepository.get(dto.getId())
                     .orElseThrow(() -> new IllegalArgumentException("There is not Attendance record with id: " + dto.getId()));
             Employee employee = employeeRepository.get(dto.getEmployeeId())
@@ -73,5 +78,10 @@ public class AttendanceService {
             AttendanceRepository attendanceRepository = new AttendanceRepository(entityManager);
             attendanceRepository.deleteByEmployeeId(employeeId);
         });
+    }
+
+    private static void validateDTO(AttendanceDTO dto) {
+        if(dto.getEmployeeId() == null || dto.getDate() == null || dto.getStatus() == null)
+            throw new IllegalArgumentException("Employee Id, Date and Status are required");
     }
 }

@@ -14,6 +14,7 @@ public class JobService {
     }
 
     public static JobDTO createJob(JobDTO dto) {
+        validateDTO(dto);
         return Database.doInTransaction(entityManager -> {
             JobRepository jobRepository = new JobRepository(entityManager);
             return JobDTO.of(jobRepository.create(JobDTO.toJob(dto)));
@@ -37,8 +38,11 @@ public class JobService {
     }
 
     public static JobDTO updateJob(JobDTO dto){
+        validateDTO(dto);
         return Database.doInTransaction(entityManager -> {
             JobRepository jobRepository = new JobRepository(entityManager);
+            if (dto.getId() == null)
+                throw new IllegalArgumentException("Id is required.");
             Job job = jobRepository.get(dto.getId())
                     .orElseThrow(() -> new IllegalArgumentException("There is no job with id: " + dto.getId()));
             return JobDTO.of(jobRepository.update(JobDTO.toJob(dto)));
@@ -53,6 +57,14 @@ public class JobService {
             });
         } catch (Exception e) {
             throw new IllegalArgumentException("Can't delete job with id: " + id + ". You need to update all the employees record associated with this job first.");
+        }
+    }
+
+    private static void validateDTO(JobDTO dto){
+        if(dto.getTitle() == null || dto.getMaxSalary() == null
+                || dto.getMinSalary() == null || dto.getMaxSalary().doubleValue() < dto.getMinSalary().doubleValue()
+                || dto.getMinSalary().doubleValue() < 0.0 || dto.getMaxSalary().doubleValue() < 0.0){
+            throw new IllegalArgumentException("Title, Min Salary, Max Salary are required and Min Salary can't be greater than Max Salary. Salaries can't be lower than 0");
         }
     }
 }
