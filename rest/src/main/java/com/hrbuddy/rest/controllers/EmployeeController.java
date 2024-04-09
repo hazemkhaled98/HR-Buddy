@@ -1,5 +1,6 @@
 package com.hrbuddy.rest.controllers;
 
+import com.hrbuddy.rest.beans.EmployeesFilters;
 import com.hrbuddy.rest.exceptions.BadRequestException;
 import com.hrbuddy.rest.exceptions.InternalServerErrorException;
 import com.hrbuddy.rest.exceptions.ResourceNotFoundException;
@@ -20,22 +21,14 @@ import java.util.Optional;
 public class EmployeeController {
     @GET
     @Produces({MediaType.APPLICATION_JSON, MediaType.APPLICATION_XML})
-    public Response getAllEmployees(
-            @QueryParam("departmentId") int departmentId,
-            @QueryParam("jobId") int jobId,
-            @QueryParam("managerId") int managerId,
-            @QueryParam("offset") int offset,
-            @QueryParam("limit") int limit,
-            @QueryParam("fields") String fieldsParam,
-            @Context HttpHeaders headers
-    ) {
+    public Response getAllEmployees(@BeanParam EmployeesFilters filters, @Context HttpHeaders headers) {
         SecurityManager.authorizeUser(headers);
-        List<EmployeeDTO> employees = EmployeeService.getAllEmployees(departmentId, jobId, managerId, offset, limit);
+        List<EmployeeDTO> employees = EmployeeService.getAllEmployees(filters.getDepartmentId(), filters.getJobId(), filters.getManagerId(), filters.getOffset(), filters.getOffset());
         if(employees.isEmpty()){
             throw new ResourceNotFoundException("No employees found");
         }
 
-        filterEmployees(employees, fieldsParam);
+        filterEmployees(employees, filters.getFieldsParam());
 
         GenericEntity<List<EmployeeDTO>> entity = new GenericEntity<>(employees) {};
         return Response.ok(entity).build();
