@@ -58,10 +58,14 @@ public class DepartmentService {
     }
 
     public static void deleteDepartment(int id){
-        Database.doInTransactionWithoutResult(entityManager -> {
-            DepartmentRepository departmentRepository = new DepartmentRepository(entityManager);
-            departmentRepository.deleteById(id);
-        });
+        try {
+            Database.doInTransactionWithoutResult(entityManager -> {
+                    DepartmentRepository departmentRepository = new DepartmentRepository(entityManager);
+                    departmentRepository.deleteById(id);
+            });
+        }  catch (Exception e) {
+            throw new IllegalArgumentException("Can't delete department with id: " + id + ". You need to update all the employees record associated with this department first.");
+        }
     }
 
 }

@@ -46,9 +46,13 @@ public class JobService {
     }
 
     public static void deleteJob(int id){
-        Database.doInTransactionWithoutResult(entityManager -> {
-            JobRepository jobRepository = new JobRepository(entityManager);
-            jobRepository.deleteById(id);
-        });
+        try{
+            Database.doInTransactionWithoutResult(entityManager -> {
+                JobRepository jobRepository = new JobRepository(entityManager);
+                jobRepository.deleteById(id);
+            });
+        } catch (Exception e) {
+            throw new IllegalArgumentException("Can't delete job with id: " + id + ". You need to update all the employees record associated with this job first.");
+        }
     }
 }

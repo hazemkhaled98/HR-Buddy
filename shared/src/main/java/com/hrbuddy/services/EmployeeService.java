@@ -104,9 +104,13 @@ public class EmployeeService {
     }
 
     public static void deleteEmployee(int id){
-        Database.doInTransactionWithoutResult(entityManager -> {
-            EmployeeRepository employeeRepository = new EmployeeRepository(entityManager);
-            employeeRepository.deleteById(id);
-        });
+        try {
+            Database.doInTransactionWithoutResult(entityManager -> {
+                    EmployeeRepository employeeRepository = new EmployeeRepository(entityManager);
+                    employeeRepository.deleteById(id);
+            });
+        } catch (RuntimeException e) {
+            throw new IllegalArgumentException("Can't delete employee with id: " + id + ". You need to delete all the attendance and vacations first. Also if this employee is a manager, You need to update the managed department and employees records.");
+        }
     }
 }

@@ -1,7 +1,7 @@
 package com.hrbuddy.rest.exceptions.mappers;
 
 import com.hrbuddy.rest.exceptions.response.ErrorDetails;
-import com.hrbuddy.rest.exceptions.response.ResponseMessage;
+import com.hrbuddy.rest.exceptions.response.ErrorMessage;
 import jakarta.ws.rs.core.Response;
 import jakarta.ws.rs.ext.ExceptionMapper;
 import jakarta.ws.rs.ext.Provider;
@@ -13,7 +13,7 @@ public class IllegalArugmentExceptionMapper implements ExceptionMapper<IllegalAr
     public Response toResponse(IllegalArgumentException exception) {
         ErrorDetails errorDetails = ErrorDetails
                 .builder()
-                .message(ResponseMessage.BAD_REQUEST.name())
+                .message(ErrorMessage.BAD_REQUEST.name())
                 .code(400)
                 .description(exception.getMessage())
                 .build();

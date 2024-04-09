@@ -1,7 +1,7 @@
 package com.hrbuddy.rest.exceptions.mappers;
 
 import com.hrbuddy.rest.exceptions.response.ErrorDetails;
-import com.hrbuddy.rest.exceptions.response.ResponseMessage;
+import com.hrbuddy.rest.exceptions.response.ErrorMessage;
 import jakarta.ws.rs.core.Response;
 import jakarta.ws.rs.ext.ExceptionMapper;
 import jakarta.ws.rs.ext.Provider;
@@ -15,7 +15,7 @@ public class NoSuchElementExceptionMapper implements ExceptionMapper<NoSuchEleme
     public Response toResponse(NoSuchElementException e) {
         ErrorDetails errorDetails = ErrorDetails
                 .builder()
-                .message(ResponseMessage.NOT_FOUND.name())
+                .message(ErrorMessage.NOT_FOUND.name())
                 .code(404)
                 .description(e.getMessage())
                 .build();
