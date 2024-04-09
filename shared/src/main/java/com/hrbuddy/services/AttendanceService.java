@@ -27,10 +27,10 @@ public class AttendanceService {
         });
     }
 
-    public static List<AttendanceDTO> getAllAttendanceRecords() {
+    public static List<AttendanceDTO> getAllAttendanceRecords(int employeeId) {
         return Database.doInTransaction(entityManager -> {
             AttendanceRepository attendanceRepository = new AttendanceRepository(entityManager);
-            return AttendanceDTO.of(attendanceRepository.getAll());
+            return AttendanceDTO.of(employeeId != 0 ? attendanceRepository.getAllByEmployeeId(employeeId) : attendanceRepository.getAll());
         });
     }
 

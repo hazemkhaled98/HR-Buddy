@@ -87,4 +87,9 @@ public class Employee {
     @ToString.Exclude
     private Set<Employee> managedEmployees = new LinkedHashSet<>();
 
+
+    @OneToMany(mappedBy = "employee")
+    @ToString.Exclude
+    private Set<Vacation> vacations = new LinkedHashSet<>();
+
 }

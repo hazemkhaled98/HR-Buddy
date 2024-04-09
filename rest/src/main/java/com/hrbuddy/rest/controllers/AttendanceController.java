@@ -17,8 +17,8 @@ public class AttendanceController {
 
     @GET
     @Produces({MediaType.APPLICATION_JSON, MediaType.APPLICATION_XML})
-    public Response getAllAttendanceRecords() {
-        List<AttendanceDTO> attendances = AttendanceService.getAllAttendanceRecords();
+    public Response getAllAttendanceRecords(@QueryParam("employeeId") int employeeId) {
+        List<AttendanceDTO> attendances = AttendanceService.getAllAttendanceRecords(employeeId);
         if(attendances.isEmpty()){
             throw new ResourceNotFoundException("No attendance records found");
         }
