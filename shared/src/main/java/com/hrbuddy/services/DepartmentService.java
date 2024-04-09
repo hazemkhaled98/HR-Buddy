@@ -8,7 +8,7 @@ import com.hrbuddy.persistence.repositories.EmployeeRepository;
 import com.hrbuddy.services.dto.DepartmentDTO;
 
 import java.util.List;
-import java.util.Optional;
+import java.util.NoSuchElementException;
 
 public class DepartmentService {
 
@@ -19,27 +19,27 @@ public class DepartmentService {
         return Database.doInTransaction(entityManager -> {
             DepartmentRepository  departmentRepository = new DepartmentRepository(entityManager);
             EmployeeRepository employeeRepository = new EmployeeRepository(entityManager);
-            Optional<Employee> manager = employeeRepository.get(dto.getManagerId());
-            if(manager.isEmpty())
-                throw new IllegalArgumentException("There is not manager with id: " + dto.getManagerId());
+            Employee manager = employeeRepository.get(dto.getManagerId())
+                    .orElseThrow(() -> new IllegalArgumentException("There is no manager with id: " + dto.getManagerId()));
             Department department = DepartmentDTO.toDepartment(dto);
-            department.setDepartmentManager(manager.get());
+            department.setDepartmentManager(manager);
             return DepartmentDTO.of(departmentRepository.create(department));
         });
     }
 
     public static List<DepartmentDTO> getAllDepartments() {
         return Database.doInTransaction(entityManager -> {
-            DepartmentRepository  departmentRepository = new DepartmentRepository(entityManager);
+            DepartmentRepository departmentRepository = new DepartmentRepository(entityManager);
             return DepartmentDTO.of(departmentRepository.getAll());
         });
     }
 
-    public static Optional<DepartmentDTO> getDepartment(int id) {
+    public static DepartmentDTO getDepartment(int id) {
         return Database.doInTransaction(entityManager -> {
             DepartmentRepository departmentRepository = new DepartmentRepository(entityManager);
-            Optional<Department> department = departmentRepository.get(id);
-            return department.map(DepartmentDTO::of);
+            Department department = departmentRepository.get(id)
+                    .orElseThrow(() -> new NoSuchElementException("There is no department with id: " + id));
+            return DepartmentDTO.of(department);
         });
     }
 
@@ -47,14 +47,12 @@ public class DepartmentService {
         return Database.doInTransaction(entityManager -> {
             DepartmentRepository  departmentRepository = new DepartmentRepository(entityManager);
             EmployeeRepository employeeRepository = new EmployeeRepository(entityManager);
-            Optional<Department> department = departmentRepository.get(dto.getId());
-            Optional<Employee> manager = employeeRepository.get(dto.getManagerId());
-            if(department.isEmpty())
-                throw new IllegalArgumentException("Attendance record was not found");
-            if(manager.isEmpty())
-                throw new IllegalArgumentException("There is not manager with id: " + dto.getManagerId());
+            Department department = departmentRepository.get(dto.getId())
+                    .orElseThrow(() -> new IllegalArgumentException("There is no department with id: " + dto.getId()));
+            Employee manager = employeeRepository.get(dto.getManagerId())
+                    .orElseThrow(() -> new IllegalArgumentException("There is no manager with id: " + dto.getManagerId()));
             Department updatedDepartment = departmentRepository.update(DepartmentDTO.toDepartment(dto));
-            updatedDepartment.setDepartmentManager(manager.get());
+            updatedDepartment.setDepartmentManager(manager);
             return DepartmentDTO.of(updatedDepartment);
         });
     }

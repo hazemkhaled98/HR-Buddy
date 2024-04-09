@@ -8,7 +8,8 @@ import com.hrbuddy.persistence.repositories.EmployeeRepository;
 import com.hrbuddy.services.dto.AttendanceDTO;
 
 import java.util.List;
-import java.util.Optional;
+import java.util.NoSuchElementException;
+
 public class AttendanceService {
 
     private AttendanceService() {
@@ -18,11 +19,10 @@ public class AttendanceService {
         return Database.doInTransaction(entityManager -> {
             AttendanceRepository attendanceRepository = new AttendanceRepository(entityManager);
             EmployeeRepository employeeRepository = new EmployeeRepository(entityManager);
-            Optional<Employee> employee = employeeRepository.get(dto.getEmployeeId());
-            if(employee.isEmpty())
-                throw new IllegalArgumentException("There is not employee with id: " + dto.getEmployeeId());
+            Employee employee = employeeRepository.get(dto.getEmployeeId())
+                    .orElseThrow(() -> new IllegalArgumentException("There is not employee with id: " + dto.getEmployeeId()));
             Attendance attendance = AttendanceDTO.toAttendance(dto);
-            attendance.setEmployee(employee.get());
+            attendance.setEmployee(employee);
             return AttendanceDTO.of(attendanceRepository.create(attendance));
         });
     }
@@ -34,11 +34,12 @@ public class AttendanceService {
         });
     }
 
-    public static Optional<AttendanceDTO> getAttendanceRecord(int id) {
+    public static AttendanceDTO getAttendanceRecord(int id) {
         return Database.doInTransaction(entityManager -> {
             AttendanceRepository attendanceRepository = new AttendanceRepository(entityManager);
-            Optional<Attendance> attendance = attendanceRepository.get(id);
-            return attendance.map(AttendanceDTO::of);
+            Attendance attendance = attendanceRepository.get(id)
+                    .orElseThrow(() -> new NoSuchElementException("Attendance with id: " + id + " record was not found"));
+            return AttendanceDTO.of(attendance);
         });
     }
 
@@ -46,14 +47,12 @@ public class AttendanceService {
         return Database.doInTransaction(entityManager -> {
             AttendanceRepository attendanceRepository = new AttendanceRepository(entityManager);
             EmployeeRepository employeeRepository = new EmployeeRepository(entityManager);
-            Optional<Attendance> attendance = attendanceRepository.get(dto.getId());
-            Optional<Employee> employee = employeeRepository.get(dto.getEmployeeId());
-            if(attendance.isEmpty())
-                throw new IllegalArgumentException("Attendance record was not found");
-            if(employee.isEmpty())
-                throw new IllegalArgumentException("There is not employee with id: " + dto.getEmployeeId());
+            Attendance attendance = attendanceRepository.get(dto.getId())
+                    .orElseThrow(() -> new IllegalArgumentException("There is not Attendance record with id: " + dto.getId()));
+            Employee employee = employeeRepository.get(dto.getEmployeeId())
+                    .orElseThrow(() -> new IllegalArgumentException("There is not employee with id: " + dto.getEmployeeId()));
             Attendance updatedAttendance = AttendanceDTO.toAttendance(dto);
-            updatedAttendance.setEmployee(employee.get());
+            updatedAttendance.setEmployee(employee);
             updatedAttendance = attendanceRepository.update(updatedAttendance);
             return AttendanceDTO.of(updatedAttendance);
         });
@@ -68,6 +67,9 @@ public class AttendanceService {
 
     public static void deleteAllAttendanceByEmployeeId(int employeeId) {
         Database.doInTransactionWithoutResult(entityManager -> {
+            if(employeeId == 0){
+                throw new IllegalArgumentException("Employee id is required");
+            }
             AttendanceRepository attendanceRepository = new AttendanceRepository(entityManager);
             attendanceRepository.deleteByEmployeeId(employeeId);
         });

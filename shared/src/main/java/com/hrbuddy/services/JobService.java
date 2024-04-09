@@ -6,6 +6,7 @@ import com.hrbuddy.persistence.repositories.JobRepository;
 import com.hrbuddy.services.dto.JobDTO;
 
 import java.util.List;
+import java.util.NoSuchElementException;
 import java.util.Optional;
 public class JobService {
 
@@ -26,20 +27,20 @@ public class JobService {
         });
     }
 
-    public static Optional<JobDTO> getJob(int id) {
+    public static JobDTO getJob(int id) {
         return Database.doInTransaction(entityManager -> {
            JobRepository jobRepository = new JobRepository(entityManager);
-            Optional<Job> job = jobRepository.get(id);
-            return job.map(JobDTO::of);
+            Job job = jobRepository.get(id)
+                    .orElseThrow(() -> new NoSuchElementException("There is no job with id: " + id));
+            return JobDTO.of(job);
         });
     }
 
     public static JobDTO updateJob(JobDTO dto){
         return Database.doInTransaction(entityManager -> {
             JobRepository jobRepository = new JobRepository(entityManager);
-            Optional<Job> job = jobRepository.get(dto.getId());
-            if(job.isEmpty())
-                throw new IllegalArgumentException("Job was not found");
+            Job job = jobRepository.get(dto.getId())
+                    .orElseThrow(() -> new IllegalArgumentException("There is no job with id: " + dto.getId()));
             return JobDTO.of(jobRepository.update(JobDTO.toJob(dto)));
         });
     }

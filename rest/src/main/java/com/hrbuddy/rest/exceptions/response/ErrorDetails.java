@@ -13,7 +13,7 @@ import lombok.*;
 @Getter
 @Setter
 @Builder
-public class ErrorResponse {
+public class ErrorDetails {
     private String message;
     private int code;
     private String description;

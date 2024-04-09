@@ -6,7 +6,6 @@ import com.hrbuddy.persistence.repositories.UserRepository;
 import com.hrbuddy.services.dto.UserDTO;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 
-import java.util.Optional;
 
 public class UserService {
 
@@ -18,15 +17,14 @@ public class UserService {
     public static UserDTO login(UserDTO dto){
         return Database.doInTransaction(entityManager -> {
             UserRepository repository = new UserRepository(entityManager);
-            Optional<User> user = repository.getByEmail(dto.getEmail());
-            if (user.isEmpty()){
-                throw new IllegalArgumentException("Wrong Credentials. Email or password are incorrect");
-            }
-            String password = user.get().getPassword();
+            User user = repository.getByEmail(dto.getEmail())
+                    .orElseThrow(() -> new IllegalArgumentException("Wrong Credentials. Email or password are incorrect"));
+
+            String password = user.getPassword();
             if (!passwordEncoder.matches(dto.getPassword(), password)){
                 throw new IllegalArgumentException("Wrong Credentials. Email or password are incorrect");
             }
-            return UserDTO.of(user.get());
+            return UserDTO.of(user);
         });
     }
 

@@ -10,6 +10,7 @@ import com.hrbuddy.persistence.repositories.JobRepository;
 import com.hrbuddy.services.dto.EmployeeDTO;
 
 import java.util.List;
+import java.util.NoSuchElementException;
 import java.util.Optional;
 
 public class EmployeeService {
@@ -23,9 +24,8 @@ public class EmployeeService {
             DepartmentRepository departmentRepository = new DepartmentRepository(entityManager);
             EmployeeRepository employeeRepository = new EmployeeRepository(entityManager);
 
-            Optional<Job> job = jobRepository.get(dto.getJobId());
-            if(job.isEmpty())
-                throw new IllegalArgumentException("There is not job with id: " + dto.getJobId());
+            Job job = jobRepository.get(dto.getJobId())
+                    .orElseThrow(() -> new IllegalArgumentException("There is not job with id: " + dto.getJobId()));
 
 
             Optional<Department> department = Optional.empty();
@@ -45,7 +45,7 @@ public class EmployeeService {
 
             Employee employee = EmployeeDTO.toEmployee(dto);
             employee.setDepartment(department.orElse(null));
-            employee.setJob(job.get());
+            employee.setJob(job);
             employee.setManager(manager.orElse(null));
             return EmployeeDTO.of(employeeRepository.create(employee));
         });
@@ -58,11 +58,12 @@ public class EmployeeService {
         });
     }
 
-    public static Optional<EmployeeDTO> getEmployee(int id) {
+    public static EmployeeDTO getEmployee(int id) {
         return Database.doInTransaction(entityManager -> {
             EmployeeRepository employeeRepository = new EmployeeRepository(entityManager);
-            Optional<Employee> employee = employeeRepository.get(id);
-            return employee.map(EmployeeDTO::of);
+           Employee employee = employeeRepository.get(id)
+                   .orElseThrow(() -> new NoSuchElementException("There is not employee with id: " + id));
+            return EmployeeDTO.of(employee);
         });
     }
 
@@ -72,13 +73,11 @@ public class EmployeeService {
             JobRepository jobRepository = new JobRepository(entityManager);
             DepartmentRepository departmentRepository = new DepartmentRepository(entityManager);
             EmployeeRepository employeeRepository = new EmployeeRepository(entityManager);
-            Optional<Employee> employee = employeeRepository.get(dto.getId());
-            if(employee.isEmpty())
-                throw new IllegalArgumentException("There is not employee with id: " + dto.getId());
+            Employee employee = employeeRepository.get(dto.getId())
+                    .orElseThrow(() -> new IllegalArgumentException("There is not employee with id: " + dto.getId()));
 
-            Optional<Job> job = jobRepository.get(dto.getJobId());
-            if(job.isEmpty())
-                throw new IllegalArgumentException("There is not job with id: " + dto.getJobId());
+            Job job = jobRepository.get(dto.getJobId())
+                    .orElseThrow(() -> new IllegalArgumentException("There is not job with id: " + dto.getJobId()));
 
             Optional<Department> department = Optional.empty();
             if(dto.getDepartmentId() != null){
@@ -97,7 +96,7 @@ public class EmployeeService {
 
             Employee updatedEmployee = EmployeeDTO.toEmployee(dto);
             updatedEmployee.setDepartment(department.orElse(null));
-            updatedEmployee.setJob(job.get());
+            updatedEmployee.setJob(job);
             updatedEmployee.setManager(manager.orElse(null));
             updatedEmployee = employeeRepository.update(updatedEmployee);
             return EmployeeDTO.of(updatedEmployee);

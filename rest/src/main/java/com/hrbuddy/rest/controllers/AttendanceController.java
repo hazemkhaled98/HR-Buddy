@@ -1,7 +1,6 @@
 package com.hrbuddy.rest.controllers;
 
 
-import com.hrbuddy.rest.exceptions.ResourceNotFoundException;
 import com.hrbuddy.rest.security.SecurityManager;
 import com.hrbuddy.services.AttendanceService;
 import com.hrbuddy.services.dto.AttendanceDTO;
@@ -9,7 +8,6 @@ import jakarta.ws.rs.*;
 import jakarta.ws.rs.core.*;
 
 import java.util.List;
-import java.util.Optional;
 
 @Path("/attendances")
 public class AttendanceController {
@@ -21,9 +19,7 @@ public class AttendanceController {
         SecurityManager.authorizeUser(headers);
 
         List<AttendanceDTO> attendances = AttendanceService.getAllAttendanceRecords(employeeId);
-        if(attendances.isEmpty()){
-            throw new ResourceNotFoundException("No attendance records found");
-        }
+
         GenericEntity<List<AttendanceDTO>> entity = new GenericEntity<>(attendances){};
         return Response.ok().entity(entity).build();
     }
@@ -35,26 +31,20 @@ public class AttendanceController {
 
         SecurityManager.authorizeUser(headers);
 
-        Optional<AttendanceDTO> attendance = AttendanceService.getAttendanceRecord(id);
-        if(attendance.isEmpty()){
-            throw new ResourceNotFoundException("No attendance record found for id: " + id);
-        }
-        return Response.ok(attendance.get()).build();
+        AttendanceDTO attendance = AttendanceService.getAttendanceRecord(id);
+
+        return Response.ok(attendance).build();
     }
 
     @POST
     @Produces({MediaType.APPLICATION_JSON, MediaType.APPLICATION_XML})
     @Consumes({MediaType.APPLICATION_JSON, MediaType.APPLICATION_XML})
     public Response createAttendanceRecord(AttendanceDTO attendance, @Context HttpHeaders headers) {
-
         SecurityManager.authorizeAdmin(headers);
 
-        try {
-            AttendanceDTO createdAttendance = AttendanceService.createAttendance(attendance);
-            return Response.status(Response.Status.CREATED).entity(createdAttendance).build();
-        } catch (IllegalArgumentException ex){
-            throw new BadRequestException(ex.getMessage());
-        }
+        AttendanceDTO createdAttendance = AttendanceService.createAttendance(attendance);
+
+        return Response.status(Response.Status.CREATED).entity(createdAttendance).build();
     }
     @PUT
     @Produces({MediaType.APPLICATION_JSON, MediaType.APPLICATION_XML})
@@ -63,12 +53,9 @@ public class AttendanceController {
 
         SecurityManager.authorizeAdmin(headers);
 
-        try {
-            AttendanceDTO updatedAttendance = AttendanceService.updateAttendanceRecord(attendance);
-            return Response.ok().entity(updatedAttendance).build();
-        } catch (IllegalArgumentException ex){
-            throw new BadRequestException(ex.getMessage());
-        }
+        AttendanceDTO updatedAttendance = AttendanceService.updateAttendanceRecord(attendance);
+
+        return Response.ok().entity(updatedAttendance).build();
     }
 
 
@@ -81,6 +68,7 @@ public class AttendanceController {
         SecurityManager.authorizeAdmin(headers);
 
         AttendanceService.deleteAttendanceRecord(id);
+
         return Response.ok().entity("Attendance record was deleted successfully").build();
     }
 
@@ -90,11 +78,8 @@ public class AttendanceController {
 
         SecurityManager.authorizeAdmin(headers);
 
-
-        if(employeeId == 0){
-            throw new BadRequestException("Employee id is required");
-        }
         AttendanceService.deleteAllAttendanceByEmployeeId(employeeId);
+
         return Response.ok().entity("All attendance records for employee with id: " + employeeId + " were deleted successfully").build();
     }
 }
