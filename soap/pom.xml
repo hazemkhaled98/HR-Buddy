@@ -15,6 +15,12 @@
     <dependencies>
 
         <dependency>
+            <groupId>jakarta.xml.ws</groupId>
+            <artifactId>jakarta.xml.ws-api</artifactId>
+            <version>4.0.1</version>
+        </dependency>
+
+        <dependency>
             <groupId>org.glassfish.jaxb</groupId>
             <artifactId>jaxb-runtime</artifactId>
             <version>4.0.5</version>
@@ -22,9 +28,9 @@
         </dependency>
 
         <dependency>
-            <groupId>jakarta.xml.ws</groupId>
-            <artifactId>jakarta.xml.ws-api</artifactId>
-            <version>4.0.1</version>
+            <groupId>javax.activation</groupId>
+            <artifactId>activation</artifactId>
+            <version>1.1.1</version>
         </dependency>
 
         <dependency>
@@ -32,6 +38,7 @@
             <artifactId>jaxws-rt</artifactId>
             <version>4.0.2</version>
         </dependency>
+
         <dependency>
             <groupId>com.hrbuddy</groupId>
             <artifactId>shared</artifactId>
