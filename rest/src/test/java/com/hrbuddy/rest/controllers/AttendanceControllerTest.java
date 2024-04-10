@@ -1,7 +1,5 @@
 package com.hrbuddy.rest.controllers;
 
-import com.hrbuddy.persistence.entities.Attendance;
-import com.hrbuddy.persistence.entities.Employee;
 import com.hrbuddy.services.AttendanceService;
 import com.hrbuddy.services.EmployeeService;
 import com.hrbuddy.services.JobService;
@@ -80,7 +78,7 @@ class AttendanceControllerTest {
 
             assertEquals(200, response.getStatus());
 
-            AttendanceService.deleteAttendanceRecord(createdAttendance.getId());
+            AttendanceService.deleteAttendance(createdAttendance.getId());
             EmployeeService.deleteEmployee(createdEmployee.getId());
             JobService.deleteJob(createdJob.getId());
             client.close();
@@ -141,7 +139,7 @@ class AttendanceControllerTest {
 
             assertEquals(201, response.getStatus());
 
-            AttendanceService.deleteAttendanceRecord(response.readEntity(AttendanceDTO.class).getId());
+            AttendanceService.deleteAttendance(response.readEntity(AttendanceDTO.class).getId());
             EmployeeService.deleteEmployee(createdEmployee.getId());
             JobService.deleteJob(createdJob.getId());
 
@@ -193,7 +191,7 @@ class AttendanceControllerTest {
             assertEquals(200, response.getStatus());
 
 
-            AttendanceService.deleteAttendanceRecord(createdAttendance.getId());
+            AttendanceService.deleteAttendance(createdAttendance.getId());
             EmployeeService.deleteEmployee(createdEmployee.getId());
             JobService.deleteJob(createdJob.getId());
 

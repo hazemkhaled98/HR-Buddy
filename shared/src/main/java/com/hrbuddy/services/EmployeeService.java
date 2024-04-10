@@ -60,6 +60,13 @@ public class EmployeeService {
         });
     }
 
+    public static List<EmployeeDTO> getAllEmployees() {
+        return Database.doInTransaction(entityManager -> {
+            EmployeeRepository employeeRepository = new EmployeeRepository(entityManager);
+            return EmployeeDTO.of(employeeRepository.getAll());
+        });
+    }
+
     public static EmployeeDTO getEmployee(int id) {
         return Database.doInTransaction(entityManager -> {
             EmployeeRepository employeeRepository = new EmployeeRepository(entityManager);

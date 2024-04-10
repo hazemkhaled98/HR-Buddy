@@ -2,6 +2,7 @@ package com.hrbuddy.rest.security;
 
 import com.hrbuddy.rest.exceptions.ForbiddenException;
 import com.hrbuddy.rest.exceptions.UnauthorizedException;
+import com.hrbuddy.util.JwtUtil;
 import jakarta.ws.rs.core.HttpHeaders;
 
 public class SecurityManager {

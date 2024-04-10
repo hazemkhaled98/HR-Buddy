@@ -1,4 +1,4 @@
-package com.hrbuddy.rest.security;
+package com.hrbuddy.util;
 
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jwts;
@@ -9,7 +9,7 @@ import java.io.InputStream;
 import java.util.Date;
 import java.util.Properties;
 
-class JwtUtil {
+public class JwtUtil {
 
     private static String secretKey;
 

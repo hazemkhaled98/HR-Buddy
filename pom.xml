@@ -16,16 +16,10 @@
   <modules>
     <module>rest</module>
     <module>shared</module>
+      <module>soap</module>
   </modules>
 
   <dependencies>
-    <dependency>
-      <groupId>org.projectlombok</groupId>
-      <artifactId>lombok</artifactId>
-      <version>RELEASE</version>
-      <scope>provided</scope>
-    </dependency>
-
 
     <dependency>
       <groupId>jakarta.xml.bind</groupId>
@@ -35,10 +29,10 @@
     </dependency>
 
     <dependency>
-      <groupId>org.glassfish.jaxb</groupId>
-      <artifactId>jaxb-runtime</artifactId>
-      <version>4.0.5</version>
-      <scope>runtime</scope>
+      <groupId>org.projectlombok</groupId>
+      <artifactId>lombok</artifactId>
+      <version>RELEASE</version>
+      <scope>provided</scope>
     </dependency>
 
 

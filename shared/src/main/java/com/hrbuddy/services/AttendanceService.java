@@ -36,7 +36,7 @@ public class AttendanceService {
         });
     }
 
-    public static AttendanceDTO getAttendanceRecord(int id) {
+    public static AttendanceDTO getAttendance(int id) {
         return Database.doInTransaction(entityManager -> {
             AttendanceRepository attendanceRepository = new AttendanceRepository(entityManager);
             Attendance attendance = attendanceRepository.get(id)
@@ -45,7 +45,7 @@ public class AttendanceService {
         });
     }
 
-    public static AttendanceDTO updateAttendanceRecord(AttendanceDTO dto){
+    public static AttendanceDTO updateAttendance(AttendanceDTO dto){
         validateDTO(dto);
         return Database.doInTransaction(entityManager -> {
             AttendanceRepository attendanceRepository = new AttendanceRepository(entityManager);
@@ -63,7 +63,7 @@ public class AttendanceService {
         });
     }
 
-    public static void deleteAttendanceRecord(int id){
+    public static void deleteAttendance(int id){
         Database.doInTransactionWithoutResult(entityManager -> {
             AttendanceRepository attendanceRepository = new AttendanceRepository(entityManager);
             attendanceRepository.deleteById(id);

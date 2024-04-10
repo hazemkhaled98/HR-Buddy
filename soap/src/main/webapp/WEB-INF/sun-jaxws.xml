@@ -1,0 +1,39 @@
+<endpoints xmlns="http://java.sun.com/xml/ns/jax-ws/ri/runtime" version="2.0">
+
+
+    <endpoint
+            name="AttendanceService"
+            implementation="services.implementations.AttendanceWebServiceImpl"
+            url-pattern="/hrbuddy/attendances" ></endpoint>
+
+    <endpoint
+            name="EmployeeService"
+            implementation="services.implementations.EmployeeWebServiceImpl"
+            url-pattern="/hrbuddy/employees" ></endpoint>
+
+    <endpoint
+            name="JobService"
+            implementation="services.implementations.JobWebServiceImpl"
+            url-pattern="/hrbuddy/jobs" ></endpoint>
+
+    <endpoint
+            name="DepartmentService"
+            implementation="services.implementations.DepartmentWebServiceImpl"
+            url-pattern="/hrbuddy/departments" ></endpoint>
+
+    <endpoint
+            name="VacationService"
+            implementation="services.implementations.VacationWebServiceImpl"
+            url-pattern="/hrbuddy/vacations" ></endpoint>
+
+    <endpoint
+            name="UserService"
+            implementation="services.implementations.UserWebServiceImpl"
+            url-pattern="/hrbuddy/users" ></endpoint>
+
+
+
+
+
+
+</endpoints>

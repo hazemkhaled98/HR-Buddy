@@ -31,7 +31,7 @@ public class AttendanceController {
 
         SecurityManager.authorizeUser(headers);
 
-        AttendanceDTO attendance = AttendanceService.getAttendanceRecord(id);
+        AttendanceDTO attendance = AttendanceService.getAttendance(id);
 
         return Response.ok(attendance).build();
     }
@@ -53,7 +53,7 @@ public class AttendanceController {
 
         SecurityManager.authorizeAdmin(headers);
 
-        AttendanceDTO updatedAttendance = AttendanceService.updateAttendanceRecord(attendance);
+        AttendanceDTO updatedAttendance = AttendanceService.updateAttendance(attendance);
 
         return Response.ok().entity(updatedAttendance).build();
     }
@@ -67,7 +67,7 @@ public class AttendanceController {
 
         SecurityManager.authorizeAdmin(headers);
 
-        AttendanceService.deleteAttendanceRecord(id);
+        AttendanceService.deleteAttendance(id);
 
         return Response.ok().entity("Attendance record was deleted successfully").build();
     }
